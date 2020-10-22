@@ -1,7 +1,8 @@
 import app from './app';
+import Config from './config/config';
 
-const PORT = 3000;
+const PORT = Config.port;
 
 app.listen(PORT, () => {
-    console.log(`⚡️[server]: Server is running at https://localhost:${PORT}`);
+    console.log(`⚡️[server]: Server is running at http://localhost:${PORT}`);
 })
