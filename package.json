@@ -6,7 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon ./src/index.ts",
-    "build": "tsc"
+    "build": "tsc",
+	"lint": "eslint ./src",
+	"lint:fix": "eslint ./src --fix"
   },
   "repository": {
     "type": "git",
@@ -25,6 +27,8 @@
     "typescript": "^4.0.3"
   },
   "devDependencies": {
+    "eslint": "^7.11.0",
+    "eslint-config-codex": "github:codex-team/eslint-config",
     "nodemon": "^2.0.6",
     "ts-node": "^9.0.0"
   }
