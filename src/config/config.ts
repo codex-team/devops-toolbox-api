@@ -8,7 +8,7 @@ class Config {
     /**
      * The Port you are using
      */
-    static port = process.env.PORT;
+    static port: number = +process.env.PORT!;
 }
 
 export default Config;
