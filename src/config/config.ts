@@ -8,7 +8,10 @@ class Config {
     /**
      * The Port you are using
      */
-    static port: number = +process.env.PORT!;
+    public static http_port: number = +process.env.HTTP_PORT!;
+    public static ws_port: number = +process.env.WS_PORT!;
+
+
 }
 
 export default Config;
