@@ -1,8 +1,20 @@
 import app from './app';
 import Config from './config/config';
+import ws from 'ws';
 
-const PORT = Config.port;
+app.listen(Config.httpPort, () => {
+  console.log(`⚡️[server]: Server is running at http://localhost:${Config.httpPort}`);
+});
 
-app.listen(PORT, () => {
-    console.log(`⚡️[server]: Server is running at http://localhost:${PORT}`);
-})
+const server = new ws.Server({ port: Config.wsPort }, () => {
+  console.log(`⚡️[server]: Server is running at ws://localhost:${Config.wsPort}`);
+});
+
+server.on('connection', (socket) => {
+  socket.send('It works!');
+
+  socket.on('message', (data) => {
+    console.log(data);
+    socket.send('Hi!');
+  });
+});
