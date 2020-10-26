@@ -9,11 +9,11 @@ class Config {
   /**
    * The Port you are using for http connection
    */
-  public static http_port: number = +process.env.HTTP_PORT!;
+  public static httpPort: number = +process.env.HTTP_PORT!;
   /**
    * The Port you are using for web socket connection
    */
-  public static ws_port: number = +process.env.WS_PORT!;
+  public static wsPort: number = +process.env.WS_PORT!;
 }
 
 export default Config;
