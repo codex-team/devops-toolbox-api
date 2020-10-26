@@ -2,13 +2,12 @@ import app from './app';
 import Config from './config/config';
 import ws from 'ws';
 
-
-app.listen(Config.http_port, () => {
-  console.log(`⚡️[server]: Server is running at http://localhost:${Config.http_port}`);
+app.listen(Config.httpPort, () => {
+  console.log(`⚡️[server]: Server is running at http://localhost:${Config.httpPort}`);
 });
 
-const server = new ws.Server({ port: Config.ws_port }, () => {
-  console.log(`⚡️[server]: Server is running at ws://localhost:${Config.ws_port}`);
+const server = new ws.Server({ port: Config.wsPort }, () => {
+  console.log(`⚡️[server]: Server is running at ws://localhost:${Config.wsPort}`);
 });
 
 server.on('connection', (socket) => {
