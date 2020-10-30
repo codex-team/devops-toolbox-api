@@ -14,6 +14,10 @@ class Config {
    * The Port you are using for web socket connection
    */
   public static wsPort: number = +process.env.WS_PORT!;
+  /**
+   * The DB connection url
+   */
+  public static dbUrl: string = process.env.DB_URL!;
 }
 
 export default Config;
