@@ -42,6 +42,9 @@ server.on('connection', (socket) => {
         break;
     }
 
-    socket.send(JSON.stringify(result));
+    socket.send(JSON.stringify({
+      messageId: dataObj.messageId,
+      response: result,
+    }));
   });
 });
