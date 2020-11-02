@@ -26,5 +26,28 @@ function start(): void {
  */
 function getWorkspaces(): void {
   const file = fs.readFileSync('./workspaces.yml', 'utf-8');
-  YAML.parse(file);
+  const workspaces = (YAML.parse(file)).workspaces;
+
+  workspaces.forEach((item: any) => {
+    const workspace = new Workspace({
+      name: item.name,
+      authToken: item.authToken,
+      servers: item.servers,
+    });
+    saveWorkspace(workspaces);
+  });
 }
+
+/**
+ * @param workspace
+ * Send workspace information to database
+ */
+function saveWorkspace(workspace: any): void {
+  try {
+    workspace.save();
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+start();
