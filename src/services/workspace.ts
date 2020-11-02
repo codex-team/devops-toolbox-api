@@ -1,4 +1,4 @@
-import Workspace from '../models/workspace';
+import Workspace from '../database/models/workspace';
 import mongoose from 'mongoose';
 
 /**

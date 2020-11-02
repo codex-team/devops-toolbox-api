@@ -1,5 +1,5 @@
 import WorkspacesService from '../services/workspace';
-import mongoose from 'mongoose';
+import mongoose from '../database';
 
 /**
  * Workspace controller
