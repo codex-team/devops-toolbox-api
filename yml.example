@@ -1,0 +1,11 @@
+workspaces:
+  - name: User1
+    authToken: 928457
+    servers:
+      - name: Centaur
+        token: ah8F5b
+  - name: User2
+    authToken: 957245
+    servers:
+      - name: Neptune
+        token: sdf63k
