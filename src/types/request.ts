@@ -10,6 +10,10 @@ interface Request {
    * Type of request
    */
   type: string;
+  /**
+   * The Payload
+   */
+  payload: object;
 }
 
 export default Request;
