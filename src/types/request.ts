@@ -3,7 +3,7 @@
  */
 interface Request {
   /**
-   * Workspace token?
+   * Message id, which we use to send response with this id
    */
   messageId: string;
   /**
