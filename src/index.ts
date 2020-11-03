@@ -1,5 +1,5 @@
 import app from './app';
-import Config from './config/index';
+import Config from './config/config';
 import ws from 'ws';
 
 app.listen(Config.httpPort, () => {
