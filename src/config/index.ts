@@ -14,6 +14,14 @@ class Config {
    * The Port you are using for web socket connection
    */
   public static wsPort: number = +process.env.WS_PORT!;
+  /**
+   * Database URL
+   */
+  public static dbUrl: string = process.env.DB_URL!;
+  /**
+   * Workspaces config-file path
+   */
+  public static wsUrl: string = process.env.CONFIG_FILE! || './config/config.yml';
 }
 
 export default Config;

@@ -6,7 +6,7 @@ const Workspace = require('./models/workspace');
 /**
  * Connecting to mongodb
  */
-function start(): void {
+function start(url = Config.dbUrl): void {
   try {
     const url = 'mongodb+srv://xema:wCyPjqzoe7JRiGUX@cluster0.nxtjs.mongodb.net/workspaces';
 
@@ -25,7 +25,7 @@ function start(): void {
  * Get information from workspaces configuration-file
  */
 function getWorkspaces(): void {
-  const file = fs.readFileSync('./workspaces.yml', 'utf-8');
+  const file = fs.readFileSync(Config.wsUrl, 'utf-8');
   const workspaces = (YAML.parse(file)).workspaces;
 
   workspaces.forEach((item: any) => {
