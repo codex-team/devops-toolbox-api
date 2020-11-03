@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 
-dotenv.config();
+dotenv.config({ path: '../.env' });
 
 /**
  * Class for settings (data from .env and etc)

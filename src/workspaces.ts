@@ -1,15 +1,15 @@
 import fs from 'fs';
 import YAML from 'yaml';
 import mongoose from 'mongoose';
+import Config from './config/index';
 const Workspace = require('./models/workspace');
 
 /**
  * Connecting to mongodb
+ * @param url
  */
 function start(url = Config.dbUrl): void {
   try {
-    const url = 'mongodb+srv://xema:wCyPjqzoe7JRiGUX@cluster0.nxtjs.mongodb.net/workspaces';
-
     mongoose.connect(url, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
@@ -34,13 +34,13 @@ function getWorkspaces(): void {
       authToken: item.authToken,
       servers: item.servers,
     });
-    saveWorkspace(workspaces);
+    saveWorkspace(workspace);
   });
 }
 
 /**
- * @param workspace
  * Send workspace information to database
+ * @param workspace
  */
 function saveWorkspace(workspace: any): void {
   try {
