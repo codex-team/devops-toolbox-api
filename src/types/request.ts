@@ -1,5 +1,5 @@
 /**
- * Interface for typing requests
+ * Interface for requests
  */
 interface Request {
   /**

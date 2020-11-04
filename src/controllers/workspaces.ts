@@ -1,5 +1,5 @@
 import WorkspacesService from '../services/workspace';
-import mongoose from '../database';
+import Workspace from '../types/workspace';
 
 /**
  * Workspace controller
@@ -8,7 +8,7 @@ export default class WorkspacesController {
   /**
    * Get all workspaces
    */
-  public static async getWorkspaces(): Promise<mongoose.Document | null> {
-    return WorkspacesService.find({});
+  public static async getWorkspaces(): Promise<Workspace [] | null> {
+    return WorkspacesService.find();
   }
 }
