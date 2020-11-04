@@ -2,24 +2,24 @@ import fs from 'fs';
 import YAML from 'yaml';
 import mongoose from 'mongoose';
 import Config from './config';
+import ConfigData from "./types/workspaceconfig";
 import Workspace from './database/models/workspace';
+import IWorkspace from './types/workspace';
 import { type } from "os";
 
 /**
  * Connecting to mongodb
  * @param {string} url - Url of database with workspaces
  */
-function start(url: string = Config.dbUrl): void {
+async function start(url: string = Config.dbUrl): Promise<void> {
   try {
-    mongoose.connect(url, {
+    await mongoose.connect(url, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
   } catch (e) {
     console.log(e);
   }
-
-  getWorkspaces();
 }
 
 /**
@@ -27,9 +27,9 @@ function start(url: string = Config.dbUrl): void {
  */
 function getWorkspaces(): void {
   const file = fs.readFileSync(Config.wsUrl, 'utf-8');
-  const workspaces = (YAML.parse(file)).workspaces;
+  const workspaces = (YAML.parse(file) as ConfigData).workspaces;
 
-  workspaces.forEach((item: any) => {
+  workspaces.forEach((item) => {
     const workspace = new Workspace({
       name: item.name,
       authToken: item.authToken,
@@ -43,7 +43,7 @@ function getWorkspaces(): void {
  * Send workspace information to database
  * @param {object} workspace - Object, contain information of workspace
  */
-function saveWorkspace(workspace: any): void {
+function saveWorkspace(workspace: IWorkspace): void {
   try {
     workspace.save();
   } catch (e) {
@@ -51,4 +51,4 @@ function saveWorkspace(workspace: any): void {
   }
 }
 
-start();
+start().then(() => getWorkspaces());
