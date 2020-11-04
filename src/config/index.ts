@@ -21,7 +21,7 @@ class Config {
   /**
    * Workspaces config-file path
    */
-  public static wsUrl: string = process.env.CONFIG_FILE! || './config/config.yml';
+  public static wsUrl: string = process.env.CONFIG_FILE! || '../config.yml';
 }
 
 export default Config;

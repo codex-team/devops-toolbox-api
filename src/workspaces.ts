@@ -1,8 +1,9 @@
 import fs from 'fs';
 import YAML from 'yaml';
 import mongoose from 'mongoose';
-import Config from './config/index';
-const Workspace = require('./models/workspace');
+import Config from './config';
+import Workspace from './database/models/workspace';
+import { type } from "os";
 
 /**
  * Connecting to mongodb
