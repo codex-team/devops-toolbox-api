@@ -1,4 +1,5 @@
 import mongoose from '..';
+import Workspace from '../../types/workspace';
 
 /**
  * Workspace Schema
@@ -49,4 +50,4 @@ const workspaceSchema: mongoose.Schema = new mongoose.Schema({
   } ],
 });
 
-export default mongoose.model('Workspace', workspaceSchema);
+export default mongoose.model<Workspace>('Workspace', workspaceSchema);
