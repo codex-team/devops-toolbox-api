@@ -1,7 +1,8 @@
 import mongoose from '../database';
+import Server from './server';
 
 /**
- * Interface for typing Workspace
+ * Interface for workspace
  */
 export interface Workspace extends mongoose.Document {
   /**
@@ -11,29 +12,7 @@ export interface Workspace extends mongoose.Document {
   /**
    * Workspace servers
    */
-  servers: {
-    /**
-     * Server name
-     */
-    name: string;
-    /**
-     * Server token
-     */
-    token: string;
-    /**
-     * Server services
-     */
-    services: {
-      /**
-       * Service type
-       */
-      type: string;
-      /**
-       * Service payload
-       */
-      payload: object | object[];
-    }[];
-  }[];
+  servers: Server[];
 }
 
 export default Workspace;
