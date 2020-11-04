@@ -7,9 +7,9 @@ import { type } from "os";
 
 /**
  * Connecting to mongodb
- * @param url
+ * @param {string} url - Url of database with workspaces
  */
-function start(url = Config.dbUrl): void {
+function start(url: string = Config.dbUrl): void {
   try {
     mongoose.connect(url, {
       useNewUrlParser: true,
@@ -41,7 +41,7 @@ function getWorkspaces(): void {
 
 /**
  * Send workspace information to database
- * @param workspace
+ * @param {object} workspace - Object, contain information of workspace
  */
 function saveWorkspace(workspace: any): void {
   try {
