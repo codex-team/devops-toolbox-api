@@ -10,6 +10,10 @@ export interface Workspace extends mongoose.Document {
    */
   name: string;
   /**
+   * User personal token to identify the owner of the workspace
+   */
+  authToken: string;
+  /**
    * Workspace servers
    */
   servers: Server[];
