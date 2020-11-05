@@ -23,6 +23,19 @@ async function start(url: string = Config.dbUrl): Promise<void> {
 }
 
 /**
+ * Send workspace information to database
+ *
+ * @param workspace - Object, contain information of workspace
+ */
+function saveWorkspace(workspace: IWorkspace): void {
+  try {
+    workspace.save();
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+/**
  * Get information from workspaces configuration-file
  */
 function getWorkspaces(): void {
@@ -38,19 +51,6 @@ function getWorkspaces(): void {
 
     saveWorkspace(workspace);
   });
-}
-
-/**
- * Send workspace information to database
- *
- * @param workspace - Object, contain information of workspace
- */
-function saveWorkspace(workspace: IWorkspace): void {
-  try {
-    workspace.save();
-  } catch (e) {
-    console.log(e);
-  }
 }
 
 start().then(() => getWorkspaces());
