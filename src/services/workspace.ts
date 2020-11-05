@@ -7,8 +7,11 @@ import IWorkspace from '../types/workspace';
  */
 export default class WorkspacesService {
   /**
+   * Find workspaces by received data
+   *
    * @param workspaceOptions - Workspace options for looking for documents
-   * @returns - Workspaces
+   *
+   * @returns - Workspaces which are found in the database
    */
   public static async find(workspaceOptions: mongoose.FilterQuery<typeof Workspace> = {}): Promise<IWorkspace[] | null> {
     return Workspace.find(workspaceOptions);
