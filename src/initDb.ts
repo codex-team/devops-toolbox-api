@@ -5,7 +5,6 @@ import Config from './config';
 import ConfigData from "./types/workspaceConfig";
 import Workspace from './database/models/workspace';
 import IWorkspace from './types/workspace';
-import { type } from "os";
 
 /**
  * Connecting to mongodb
