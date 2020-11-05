@@ -1,0 +1,27 @@
+version: "3.2"
+services:
+  app:
+    build:
+      dockerfile: ./docker/Dockerfile.prod
+      context: .
+    ports:
+      - ${HTTP_PORT}:${HTTP_PORT}
+      - ${WS_PORT}:${WS_PORT}
+    depends_on:
+      - mongodb
+    env_file:
+      - .env
+
+  mongodb:
+    image: mongo
+    volumes:
+      - mongodata:/data/db
+      - mongo-config:/data/configdb
+    ports:
+      - 27017:27017
+
+
+volumes:
+  mongodata:
+  mongo-config:
+  app-deps:
