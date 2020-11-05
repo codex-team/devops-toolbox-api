@@ -2,14 +2,14 @@ import fs from 'fs';
 import YAML from 'yaml';
 import mongoose from 'mongoose';
 import Config from './config';
-import ConfigData from "./types/workspaceconfig";
+import ConfigData from "./types/workspaceConfig";
 import Workspace from './database/models/workspace';
 import IWorkspace from './types/workspace';
 import { type } from "os";
 
 /**
  * Connecting to mongodb
- * @param {string} url - Url of database with workspaces
+ * @param url - Url of database with workspaces
  */
 async function start(url: string = Config.dbUrl): Promise<void> {
   try {
@@ -41,7 +41,7 @@ function getWorkspaces(): void {
 
 /**
  * Send workspace information to database
- * @param {object} workspace - Object, contain information of workspace
+ * @param workspace - Object, contain information of workspace
  */
 function saveWorkspace(workspace: IWorkspace): void {
   try {
