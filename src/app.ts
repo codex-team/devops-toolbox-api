@@ -1,9 +1,29 @@
 import express from 'express';
+import services from './routes/services';
+import HttpError from './utils/httpError';
 
 const app: express.Application = express();
 
-app.get('/', (req, res) => {
+app.use(express.json());
+
+app.get('/', (req: express.Request, res: express.Response) => {
   res.send('Basic server!!');
+});
+
+app.use('/services', services);
+
+app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
+  const error: HttpError = new HttpError(404, 'Not Found');
+
+  next(error);
+});
+
+app.use((error: HttpError, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  res.status(error.status);
+
+  res.json({
+    error,
+  });
 });
 
 export default app;
