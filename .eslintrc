@@ -1,5 +1,6 @@
 {
-  "extends": [
-	  "codex"
-  ]
+  "extends": [ "codex" ],
+  "env": {
+    "node": true
+  }
 }

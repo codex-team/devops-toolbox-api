@@ -1,7 +1,7 @@
 /**
  * Interface for service
  */
-interface Service {
+export interface Service {
   /**
    * Service type
    */
@@ -11,5 +11,3 @@ interface Service {
    */
   payload: object | object[];
 }
-
-export default Service;

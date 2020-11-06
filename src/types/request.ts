@@ -1,7 +1,7 @@
 /**
  * Interface for requests
  */
-interface Request {
+export interface Request {
   /**
    * Message id, which we use to send response with this id
    */
@@ -15,5 +15,3 @@ interface Request {
    */
   payload: object;
 }
-
-export default Request;

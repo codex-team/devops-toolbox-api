@@ -1,9 +1,9 @@
-import Service from './service';
+import { Service } from './service';
 
 /**
  * Interface for server
  */
-interface Server {
+export interface Server {
   /**
    * Server name
    */
@@ -17,5 +17,3 @@ interface Server {
    */
   services: Service[];
 }
-
-export default Server;

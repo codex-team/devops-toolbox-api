@@ -1,10 +1,10 @@
 import mongoose from '../database';
-import Server from './server';
+import { Server } from './server';
 
 /**
  * Interface for workspace
  */
-export interface Workspace extends mongoose.Document {
+export interface IWorkspace extends mongoose.Document {
   /**
    * Workspace name
    */
@@ -14,5 +14,3 @@ export interface Workspace extends mongoose.Document {
    */
   servers: Server[];
 }
-
-export default Workspace;

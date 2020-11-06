@@ -1,6 +1,6 @@
 import mongoose from '../database';
 import Workspace from '../database/models/workspace';
-import IWorkspace from '../types/workspace';
+import { IWorkspace } from '../types/workspace';
 
 /**
  * Workspace service
@@ -8,7 +8,6 @@ import IWorkspace from '../types/workspace';
 export default class WorkspacesService {
   /**
    * @param workspaceOptions - Workspace options for looking for documents
-   * @returns - Workspaces
    */
   public static async find(workspaceOptions: mongoose.FilterQuery<typeof Workspace> = {}): Promise<IWorkspace[] | null> {
     return Workspace.find(workspaceOptions);

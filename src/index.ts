@@ -1,7 +1,7 @@
 import app from './app';
 import Config from './config';
 import ws from 'ws';
-import Request from './types/request';
+import { Request } from './types/request';
 import WorkspacesController from './controllers/workspaces';
 
 app.listen(Config.httpPort, () => {
