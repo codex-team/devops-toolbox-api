@@ -11,7 +11,7 @@ export default class WorkspacesService {
    * Find all workspaces with options
    *
    * @param workspaceOptions - Workspace options for looking for documents
-   * @returns - Workspace[]
+   * @returns - Promise<Workspace[] | null>
    */
   public static async find(workspaceOptions: mongoose.FilterQuery<typeof Workspace> = {}): Promise<IWorkspace[] | null> {
     return Workspace.find(workspaceOptions);

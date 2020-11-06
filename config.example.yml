@@ -1,0 +1,11 @@
+workspaces:
+  - name: CodeX
+    authToken: ac3l
+    servers:
+      - name: Neptune
+        token: ah8F5b
+  - name: User1
+    authToken: token1
+    servers:
+      - name: Server1
+        token: token1W
