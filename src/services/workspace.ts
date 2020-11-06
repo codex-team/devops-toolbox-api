@@ -8,15 +8,17 @@ import Service from '../types/service';
  */
 export default class WorkspacesService {
   /**
+   * Find all workspaces with options
    *
    * @param workspaceOptions - Workspace options for looking for documents
-   * @returns - Workspaces
+   * @returns - Workspace[]
    */
   public static async find(workspaceOptions: mongoose.FilterQuery<typeof Workspace> = {}): Promise<IWorkspace[] | null> {
     return Workspace.find(workspaceOptions);
   }
 
   /**
+   * Update server services
    *
    * @param token - Server token
    * @param actualServices - Actual services
