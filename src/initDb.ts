@@ -39,7 +39,7 @@ function saveWorkspace(workspace: IWorkspace): void {
  * Get information from workspaces configuration-file
  */
 function getWorkspaces(): void {
-  const file = fs.readFileSync(Config.wsUrl, 'utf-8');
+  const file = fs.readFileSync(Config.workspacesConfigPath, 'utf-8');
   const workspaces = (YAML.parse(file) as ConfigData).workspaces;
 
   workspaces.forEach((item) => {
