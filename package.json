@@ -8,6 +8,7 @@
     "start": "nodemon ./src/index.ts",
     "build": "tsc",
     "lint": "eslint ./src",
+    "lint:test": "eslint ./src --ext .ts --max-warnings 8",
     "lint:fix": "eslint ./src --fix"
   },
   "repository": {
