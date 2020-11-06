@@ -13,6 +13,13 @@ const workspaceSchema: mongoose.Schema = new mongoose.Schema({
     required: true,
   },
   /**
+   * User personal token to identify the owner of the workspace
+   */
+  authToken: {
+    type: String,
+    required: true,
+  },
+  /**
    * Workspace servers
    */
   servers: [ {

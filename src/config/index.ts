@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 
-dotenv.config();
+dotenv.config({ path: '../.env' });
 
 /**
  * Class for settings (data from .env and etc)
@@ -15,9 +15,13 @@ class Config {
    */
   public static wsPort: number = +process.env.WS_PORT!;
   /**
-   * The DB connection url
+   * Database URL
    */
   public static dbUrl: string = process.env.DB_URL!;
+  /**
+   * Workspaces config-file path
+   */
+  public static workspacesConfigPath: string = process.env.CONFIG_FILE! || '../config.yml';
 }
 
 export default Config;
