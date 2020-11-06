@@ -11,12 +11,18 @@ app.use(express.json());
  */
 app.use('/services', services);
 
+/**
+ * Route error
+ */
 app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
   const error: HttpError = new HttpError(404, 'Not Found');
 
   next(error);
 });
 
+/**
+ * Sending error
+ */
 app.use((error: HttpError, req: express.Request, res: express.Response, next: express.NextFunction) => {
   res.status(error.status);
 
