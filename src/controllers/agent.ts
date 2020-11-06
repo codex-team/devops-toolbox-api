@@ -12,11 +12,11 @@ export default class AgentController {
    * @param res - response
    * @returns res - response
    */
-  public static async update(req: express.Request, res: express.Response): Promise<express.Response> {
+  public static async updateServices(req: express.Request, res: express.Response): Promise<express.Response> {
     const workspace = await WorkspacesService.updateServices(req.headers.authorization, req.body.services);
 
     return res.json({
-      message: 'Updated',
+      success: workspace ? 1 : 0,
       workspace,
     });
   }
