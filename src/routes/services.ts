@@ -3,6 +3,9 @@ import AgentController from '../controllers/agent';
 
 const router: express.Router = express.Router();
 
-router.put('/', AgentController.update);
+/**
+ * Put request for update services
+ */
+router.put('/', AgentController.updateServices);
 
 export default router;
