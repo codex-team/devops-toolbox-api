@@ -6,10 +6,9 @@ const app: express.Application = express();
 
 app.use(express.json());
 
-app.get('/', (req: express.Request, res: express.Response) => {
-  res.send('Basic server!!');
-});
-
+/**
+ * Route for agents
+ */
 app.use('/services', services);
 
 app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
