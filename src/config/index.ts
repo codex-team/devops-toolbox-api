@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
-
-dotenv.config({ path: '../.env' });
+import path from 'path';
+dotenv.config({ path: path.join(__dirname, '/../../.env') });
 
 /**
  * Class for settings (data from .env and etc)
@@ -21,7 +21,7 @@ class Config {
   /**
    * Workspaces config-file path
    */
-  public static workspacesConfigPath: string = process.env.CONFIG_FILE! || '../config.yml';
+  public static workspacesConfigPath: string = process.env.CONFIG_FILE! || path.join(__dirname, '/../config.yml');
 }
 
 export default Config;
