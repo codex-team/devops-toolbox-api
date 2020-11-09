@@ -39,7 +39,7 @@ const workspaceSchema: mongoose.Schema = new mongoose.Schema({
      */
     services: [ {
       /**
-       * Service type (nginx, docker, ports, intefaces, disk)
+       * Service type (nginx, docker, ports, interfaces, disk)
        */
       type: { type: String },
       /**
