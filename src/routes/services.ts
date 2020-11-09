@@ -4,8 +4,13 @@ import AgentController from '../controllers/agent';
 const router: express.Router = express.Router();
 
 /**
- * Put request for update services
+ * PUT request for update services
  */
 router.put('/', AgentController.updateServices);
+
+/**
+ * POST request for add workspaces
+ */
+router.post('/', AgentController.addWorkspace);
 
 export default router;
