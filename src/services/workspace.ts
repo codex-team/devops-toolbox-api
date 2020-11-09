@@ -11,10 +11,22 @@ export default class WorkspacesService {
    * Find all workspaces with options
    *
    * @param workspaceOptions - Workspace options for looking for documents
-   * @returns - Promise<Workspace[] | null>
+   * @returns { Promise<Workspace[] | null> }
    */
   public static async find(workspaceOptions: mongoose.FilterQuery<typeof Workspace> = {}): Promise<IWorkspace[] | null> {
     return Workspace.find(workspaceOptions);
+  }
+
+  /**
+   * Add new workspace
+   *
+   * @param workspace - new workspace
+   * @returns { Promise<IWorkspace | null> }
+   */
+  public static async add(workspace: mongoose.FilterQuery<typeof Workspace>): Promise<IWorkspace | null> {
+    const newWorkspace = new Workspace(workspace);
+
+    return newWorkspace.save();
   }
 
   /**
@@ -28,6 +40,7 @@ export default class WorkspacesService {
       $set: {
         'servers.$.services': actualServices,
       },
+    }, {
       new: true,
     });
   }
