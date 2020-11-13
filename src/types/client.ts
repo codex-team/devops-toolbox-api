@@ -1,7 +1,7 @@
 import ws from 'ws';
 
 /**
- * Interface for client
+ * Interface for client (which client has which workspaces)
  */
 interface Client {
   /**
@@ -9,9 +9,9 @@ interface Client {
    */
   socket: ws;
   /**
-   * Client authorization token
+   * Client workspaces
    */
-  authToken: string;
+  workspaces: string[];
 }
 
 export default Client;
