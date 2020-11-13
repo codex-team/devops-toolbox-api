@@ -5,13 +5,19 @@ import ws from 'ws';
  * Clients class
  */
 class Clients {
-  private clients: { [key: string]: ws};
+  private static singleTone: Clients;
+  private clients: Client[] = [];
 
   /**
-   * Constructor
+   * Get all clients
+   *
    */
-  constructor() {
-    this.clients = {};
+  public static getClients(): Clients {
+    if (!this.singleTone) {
+      this.singleTone = new Clients();
+    }
+
+    return this.singleTone;
   }
 
   /**
@@ -20,25 +26,25 @@ class Clients {
    * @param client - Client
    */
   public add(client: Client): void {
-    this.clients[client.authToken] = client.socket;
+    this.clients.push(client);
   }
 
   /**
    * Remove client
    *
-   * @param authToken - Client authorization token
+   * @param clientSocket - Client socket
    */
-  public remove(authToken: string): void {
-    delete this.clients[authToken];
+  public remove(clientSocket: ws): void {
+    this.clients = this.clients.filter(client => client.socket != clientSocket);
   }
 
   /**
    * Find client
    *
-   * @param authToken - Client authorization token
+   * @param workspaceId - Client workspace
    */
-  public find(authToken: string): ws {
-    return this.clients[authToken];
+  public find(workspaceId: string): Client[] | undefined {
+    return this.clients.filter(client => client.workspaces.find(workspace => workspace == workspaceId));
   }
 }
 

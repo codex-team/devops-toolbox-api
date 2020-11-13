@@ -6,6 +6,8 @@ import Request from './types/request';
 import WorkspacesController from './controllers/workspaces';
 import Clients from './utils/clients';
 import Client from './types/client';
+import WorkspacesService from './services/workspace';
+import Workspace from './types/workspace';
 
 app.listen(Config.httpPort, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${Config.httpPort}`);
@@ -18,20 +20,32 @@ const server = new ws.Server({
   console.log(`⚡️[server]: Server is running at ws://localhost:${Config.wsPort}/client`);
 });
 
-const clients: Clients = new Clients();
-
-server.on('connection', (socket: ws, req: express.Request) => {
+/**
+ *  Client connects
+ */
+server.on('connection', async (socket: ws, req: express.Request) => {
   socket.send('Сonnected!');
 
-  const client: Client = {
-    socket,
-    authToken: req.headers.authorization!,
-  };
+  const clients: Clients = Clients.getClients();
 
-  clients.add(client);
+  const authToken: string = req.headers.authorization!;
+
+  const workspaces: Workspace[] | null = await WorkspacesService.find({ authToken });
+
+  if (workspaces) {
+    const client: Client = {
+      socket,
+      workspaces: workspaces.map(workspace => workspace._id),
+    };
+
+    clients.add(client);
+  } else {
+    console.log('Error authorization');
+  }
 
   socket.on('message', async (data: string) => {
     const dataObj: Request = JSON.parse(data.toString());
+
     let result;
 
     switch (dataObj.type) {
@@ -45,6 +59,11 @@ server.on('connection', (socket: ws, req: express.Request) => {
       response: result,
     }));
   });
-});
 
-export { clients };
+  /**
+   * Сlient disconnects
+   */
+  socket.on('close', () => {
+    clients.remove(socket);
+  });
+});
