@@ -2,10 +2,17 @@ import Client from '../types/client';
 import ws from 'ws';
 
 /**
- * Clients class
+ * Clients class for info about connected clients
  */
 class Clients {
+  /**
+   * Field for a single instance of a class
+   */
   private static singleTone: Clients;
+  /**
+   *
+   * Connected clients
+   */
   private clients: Client[] = [];
 
   /**
