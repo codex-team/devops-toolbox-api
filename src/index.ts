@@ -32,7 +32,7 @@ server.on('connection', async (socket: ws, req: express.Request) => {
 
   const workspaces: Workspace[] | null = await WorkspacesService.find({ authToken });
 
-  if (workspaces) {
+  if (workspaces?.length) {
     const client: Client = {
       socket,
       workspaces: workspaces.map(workspace => workspace._id),
@@ -40,7 +40,8 @@ server.on('connection', async (socket: ws, req: express.Request) => {
 
     clients.add(client);
   } else {
-    console.log('Error authorization');
+    socket.send('Error authorization');
+    socket.close(1007);
   }
 
   socket.on('message', async (data: string) => {
