@@ -4,7 +4,7 @@ import app from './app';
 import Config from './config';
 import Request from './types/request';
 import WorkspacesController from './controllers/workspaces';
-import Clients from './utils/clients';
+import ClientsList from './utils/clientsList';
 import Client from './types/client';
 import WorkspacesService from './services/workspace';
 import Workspace from './types/workspace';
@@ -26,7 +26,7 @@ const server = new ws.Server({
 server.on('connection', async (socket: ws, req: express.Request) => {
   socket.send('Сonnected!');
 
-  const clients: Clients = Clients.getClients();
+  const clients: ClientsList = ClientsList.getClients();
 
   const authToken: string = req.headers.authorization!;
 
@@ -65,6 +65,13 @@ server.on('connection', async (socket: ws, req: express.Request) => {
    * Сlient disconnects
    */
   socket.on('close', () => {
+    clients.remove(socket);
+  });
+
+  /**
+   * Error
+   */
+  socket.on('error', () => {
     clients.remove(socket);
   });
 });
