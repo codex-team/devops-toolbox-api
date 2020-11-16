@@ -8,7 +8,7 @@ class Clients {
   /**
    * Field for a single instance of a class
    */
-  private static singleTone: Clients;
+  private static instance: Clients;
   /**
    *
    * Connected clients
@@ -20,11 +20,11 @@ class Clients {
    *
    */
   public static getClients(): Clients {
-    if (!this.singleTone) {
-      this.singleTone = new Clients();
+    if (!this.instance) {
+      this.instance = new Clients();
     }
 
-    return this.singleTone;
+    return this.instance;
   }
 
   /**
