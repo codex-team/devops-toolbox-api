@@ -2,13 +2,13 @@ import Client from '../types/client';
 import ws from 'ws';
 
 /**
- * Clients class for info about connected clients
+ * ClientsList class for info about connected clients
  */
-class Clients {
+class ClientsList {
   /**
    * Field for a single instance of a class
    */
-  private static instance: Clients;
+  private static instance: ClientsList;
   /**
    *
    * Connected clients
@@ -19,9 +19,9 @@ class Clients {
    * Get all clients
    *
    */
-  public static getClients(): Clients {
+  public static getClients(): ClientsList {
     if (!this.instance) {
-      this.instance = new Clients();
+      this.instance = new ClientsList();
     }
 
     return this.instance;
@@ -55,4 +55,4 @@ class Clients {
   }
 }
 
-export default Clients;
+export default ClientsList;

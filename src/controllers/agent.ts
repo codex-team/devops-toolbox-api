@@ -1,7 +1,7 @@
 import express from 'express';
 import WorkspacesService from '../services/workspace';
 import Client from '../types/client';
-import Clients from '../utils/clients';
+import ClientsList from '../utils/clientsList';
 
 /**
  * Agent controller
@@ -17,7 +17,7 @@ export default class AgentController {
     const workspace = await WorkspacesService.updateServices(req.headers.authorization, req.body.services);
 
     if (workspace) {
-      const clients: Client[] | undefined = Clients.getClients().find(workspace._id.toString());
+      const clients: Client[] | undefined = ClientsList.getClients().find(workspace._id.toString());
 
       clients?.forEach(client => client.socket.send(JSON.stringify(workspace)));
     }
