@@ -51,7 +51,7 @@ class ClientsList {
    * @param workspaceId - Client workspace
    */
   public find(workspaceId: string): Client[] | undefined {
-    return this.clients.filter(client => client.workspaces.find(workspace => workspace == workspaceId));
+    return this.clients.filter(client => client.workspaceIds.find(id => id == workspaceId));
   }
 }
 
