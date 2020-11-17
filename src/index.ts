@@ -7,7 +7,6 @@ import WorkspacesController from './controllers/workspaces';
 import ClientsList from './utils/clientsList';
 import Client from './types/client';
 import WorkspacesService from './services/workspace';
-import Workspace from './types/workspace';
 
 app.listen(Config.httpPort, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${Config.httpPort}`);
@@ -26,22 +25,35 @@ const server = new ws.Server({
 server.on('connection', async (socket: ws, req: express.Request) => {
   socket.send('Сonnected!');
 
-  const clients: ClientsList = ClientsList.getClients();
+  /**
+   * Current connected clients
+   */
+  const clients = ClientsList.getClients();
 
-  const authToken: string = req.headers.authorization!;
+  /**
+   * Connecting client authorization token
+   */
+  const authToken = req.headers.authorization!;
 
-  const workspaces: Workspace[] | null = await WorkspacesService.find({ authToken });
+  /**
+   * Connecting client workspaces
+   */
+  const workspaces = await WorkspacesService.find({ authToken });
 
   if (workspaces?.length) {
     const client: Client = {
       socket,
-      workspaces: workspaces.map(workspace => workspace._id),
+      workspaceIds: workspaces.map(workspace => workspace._id),
     };
 
     clients.add(client);
   } else {
     socket.send('Error authorization');
-    socket.close(1007);
+
+    /**
+     * 1007 - Wrong request (https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent)
+     */
+    socket.close(1007, 'Wrong authorization token');
   }
 
   socket.on('message', async (data: string) => {
