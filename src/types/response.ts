@@ -1,11 +1,11 @@
 /**
  * Interface for response
  */
-interface Request {
+interface Response {
   /**
    * Message id, which we use to send response with this id
    */
-  messageId: string;
+  messageId: string | null;
   /**
    * Type of request
    */
@@ -16,4 +16,4 @@ interface Request {
   payload: object;
 }
 
-export default Request;
+export default Response;
