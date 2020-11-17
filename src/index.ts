@@ -26,10 +26,7 @@ server.on('connection', (socket, req) => {
 
     switch (dataObj.type) {
       case 'getWorkspaces':
-        result = await WorkspacesController.getWorkspaces();
-        break;
-      case 'getWorkspace':
-        result = await WorkspacesController.getWorkspace(userToken);
+        result = await WorkspacesController.getWorkspaces(userToken);
         break;
     }
 
