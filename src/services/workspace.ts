@@ -17,15 +17,6 @@ export default class WorkspacesService {
   }
 
   /**
-   * Find one workspace by token
-   *
-   * @param userToken - Workspace options for looking for documents
-   */
-  public static async findOne(userToken: string | undefined): Promise<IWorkspace | null> {
-    return Workspace.findOne({ authToken: userToken });
-  }
-
-  /**
    * Update server services
    *
    * @param token - Server token
