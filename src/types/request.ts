@@ -1,5 +1,5 @@
 /**
- * Interface for requests
+ * Interface for request
  */
 interface Request {
   /**
