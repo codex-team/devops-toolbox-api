@@ -8,9 +8,4 @@ const router: express.Router = express.Router();
  */
 router.put('/', AgentController.updateServices);
 
-/**
- * POST request for add workspaces
- */
-router.post('/', AgentController.addWorkspace);
-
 export default router;
