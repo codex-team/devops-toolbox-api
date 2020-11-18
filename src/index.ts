@@ -26,7 +26,7 @@ server.on('connection', async (socket: ws, req: express.Request) => {
   socket.send('Сonnected!');
 
   /**
-   * Current connected clients
+   * Currently connected clients
    */
   const clients = ClientsList.getClients();
 
