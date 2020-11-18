@@ -74,7 +74,7 @@ server.on('connection', async (socket: ws, req: express.Request) => {
   });
 
   /**
-   * Сlient disconnects
+   * Сlient disconnecting handler
    */
   socket.on('close', () => {
     clients.remove(socket);
