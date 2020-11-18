@@ -36,7 +36,7 @@ server.on('connection', async (socket: ws, req: express.Request) => {
   const authToken = req.headers.authorization!;
 
   /**
-   * Connecting client workspaces
+   * Connected client's workspaces list
    */
   const workspaces = await WorkspacesService.find({ authToken });
 
