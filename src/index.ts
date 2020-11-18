@@ -81,7 +81,7 @@ server.on('connection', async (socket: ws, req: express.Request) => {
   });
 
   /**
-   * Error
+   * Sockets error handler 
    */
   socket.on('error', () => {
     clients.remove(socket);
