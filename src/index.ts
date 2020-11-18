@@ -31,7 +31,7 @@ server.on('connection', async (socket: ws, req: express.Request) => {
   const clients = ClientsList.getClients();
 
   /**
-   * Connecting client authorization token
+   * Connected client's authorization token
    */
   const authToken = req.headers.authorization!;
 
