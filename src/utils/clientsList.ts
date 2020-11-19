@@ -19,7 +19,7 @@ class ClientsList {
    * Get all clients
    *
    */
-  public static getClients(): ClientsList {
+  public static getAll(): ClientsList {
     if (!this.instance) {
       this.instance = new ClientsList();
     }

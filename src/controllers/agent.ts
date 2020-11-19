@@ -18,7 +18,7 @@ export default class AgentController {
     const workspace: Workspace | null = await WorkspacesService.updateServices(req.headers.authorization, req.body.services);
 
     if (workspace) {
-      const clients: Client[] | undefined = ClientsList.getClients().find(workspace._id.toString());
+      const clients: Client[] | undefined = ClientsList.getAll().find(workspace._id.toString());
 
       clients?.forEach(client => Server.send(client.socket, null, { workspace }));
     }
