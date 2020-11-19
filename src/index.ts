@@ -14,4 +14,7 @@ const server = new ws.Server({
   console.log(`⚡️[server]: Server is running at ws://localhost:${Config.wsPort}/client`);
 });
 
+/**
+ *  Client connects
+ */
 server.on('connection', Server.connection);
