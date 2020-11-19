@@ -53,12 +53,12 @@ export default class Server {
    */
   public static async connection(socket: ws, req: express.Request): Promise<void> {
     /**
-     * Connecting client authorization token
+     * Connected client's authorization token
      */
     const authToken: string | undefined = req.headers.authorization;
 
     /**
-     * Connecting client workspaces
+     * Connected client's workspaces list
      */
     const workspaces = await WorkspacesService.find({ authToken });
 
@@ -77,17 +77,17 @@ export default class Server {
     Server.clients.add(client);
 
     /**
-     * Incoming message handler
+     * Connected client's workspaces list
      */
     socket.on('message', Server.onmessage);
 
     /**
-     * Client disconnects
+     * Сlient disconnecting handler
      */
     socket.on('close', Server.onclose);
 
     /**
-     * Error
+     * Sockets error handler
      */
     socket.on('error', Server.onerror);
   }
