@@ -1,4 +1,4 @@
-import Client from '../types/client';
+import { Client } from '../types';
 import ws from 'ws';
 
 /**
@@ -51,7 +51,7 @@ class ClientsList {
    * @param workspaceId - Client workspace
    */
   public find(workspaceId: string): Client[] | undefined {
-    return this.clients.filter(client => client.workspaceIds.find(id => id == workspaceId));
+    return this.clients.filter(client => client.workspaceIds?.find(id => id == workspaceId));
   }
 }
 

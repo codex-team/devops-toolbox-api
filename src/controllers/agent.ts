@@ -1,9 +1,8 @@
 import express from 'express';
 import WorkspacesService from '../services/workspace';
-import Client from '../types/client';
 import ClientsList from '../utils/clientsList';
-import Workspace from '../types/workspace';
-import Response from '../types/response';
+import Server from '../utils/server';
+import { Workspace, Client } from '../types';
 
 /**
  * Agent controller
@@ -21,15 +20,7 @@ export default class AgentController {
     if (workspace) {
       const clients: Client[] | undefined = ClientsList.getClients().find(workspace._id.toString());
 
-      const wsResponse: Response = {
-        messageId: null,
-        type: 'updateServices',
-        payload: {
-          updatedWorkspace: workspace,
-        },
-      };
-
-      clients?.forEach(client => client.socket.send(JSON.stringify(wsResponse)));
+      clients?.forEach(client => Server.send(client.socket, null, { workspace }));
     }
 
     res.json({

@@ -1,5 +1,5 @@
 import mongoose from '..';
-import Workspace from '../../types/workspace';
+import { Workspace } from '../../types';
 
 /**
  * Workspace Schema

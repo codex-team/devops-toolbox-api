@@ -1,7 +1,6 @@
 import mongoose from '../database';
 import Workspace from '../database/models/workspace';
-import IWorkspace from '../types/workspace';
-import Service from '../types/service';
+import { Workspace as IWorkspace, Service } from '../types';
 
 /**
  * Workspace service

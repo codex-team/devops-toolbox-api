@@ -11,7 +11,7 @@ interface Client {
   /**
    * Client workspaces
    */
-  workspaceIds: string[];
+  workspaceIds: string[] | undefined;
 }
 
 export default Client;
