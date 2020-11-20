@@ -22,6 +22,10 @@ class Config {
    * Workspaces config-file path
    */
   public static workspacesConfigPath: string = process.env.CONFIG_FILE! || '../config.yml';
+  /**
+   * Accept only connections matching this path.
+   */
+  public static wsPath: string = process.env.WS_PATH!;
 }
 
 export default Config;
