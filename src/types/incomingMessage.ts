@@ -1,9 +1,12 @@
+import RequestMessage from './requestMessage';
+
 /**
  * Message that initiated by the client
  */
-import RequestMessage from './requestMessage';
-
 interface IncomingMessage extends RequestMessage {
+  /**
+   * Type of request like 'getWorkspaces' and etc.
+   */
   type: string;
 }
 
