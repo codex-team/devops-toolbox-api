@@ -3,8 +3,9 @@ import express from 'express';
 import WorkspacesService from '../../services/workspace';
 import WorkspacesController from '../../controllers/workspaces';
 import ClientsList from '../clientsList';
-import { OutgoingMessage, ResponseMessage, MessagePayload, Message, Client, IncomingMessage } from '../../types';
-import { TransportOptions } from './types';
+import { Client } from '../../types';
+import { TransportOptions, OutgoingMessage, ResponseMessage, MessagePayload, IncomingMessage } from './types';
+import MessageCreator from './messageCreator';
 
 /**
  * Class Transport (Transport level)
@@ -38,31 +39,10 @@ export default class Transport {
    * Method for sending a messages to the client
    *
    * @param socket - client
-   * @param messageId - message Id
-   * @param payload - payload
+   * @param message - message
    */
-  public static send(socket: ws, messageId: string | null, payload: object): void {
-    const message: Message = {
-      payload,
-    };
-
-    if (messageId) {
-      const response: ResponseMessage = {
-        payload: message.payload,
-        messageId,
-      };
-
-      socket.send(JSON.stringify(response));
-
-      return;
-    }
-
-    const outgoingMessage: OutgoingMessage = {
-      payload: message.payload,
-      type: 'workspace-update',
-    };
-
-    socket.send(JSON.stringify(outgoingMessage));
+  public static send(socket: ws, message: ResponseMessage | OutgoingMessage): void {
+    socket.send(JSON.stringify(message));
   }
 
   /**
@@ -130,7 +110,9 @@ export default class Transport {
         break;
     }
 
-    Transport.send(this, dataObj.messageId, payload);
+    const message: ResponseMessage | OutgoingMessage = MessageCreator.create(dataObj.type, dataObj.messageId, payload);
+
+    Transport.send(this, message);
   }
 
   /**
