@@ -1,7 +1,7 @@
 import express from 'express';
 import WorkspacesService from '../services/workspace';
 import ClientsList from '../utils/clientsList';
-import Server from '../utils/server';
+import Transport from '../utils/protocol/transport';
 import { Workspace, Client } from '../types';
 
 /**
@@ -20,7 +20,7 @@ export default class AgentController {
     if (workspace) {
       const clients: Client[] | undefined = ClientsList.getAll().find(workspace._id.toString());
 
-      clients?.forEach(client => Server.send(client.socket, null, { workspace }));
+      clients?.forEach(client => Transport.send(client.socket, null, { workspace }));
     }
 
     res.json({

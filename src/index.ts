@@ -1,20 +1,12 @@
 import app from './app';
 import Config from './config';
-import Server from './utils/server';
-import ws from 'ws';
+import Transport from './utils/protocol/transport';
 
 app.listen(Config.httpPort, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${Config.httpPort}`);
 });
 
-const server = new ws.Server({
+const transport: Transport = new Transport({
   port: Config.wsPort,
-  path: '/client',
-}, () => {
-  console.log(`⚡️[server]: Server is running at ws://localhost:${Config.wsPort}/client`);
+  route: Config.wsPath,
 });
-
-/**
- *  Client connects
- */
-server.on('connection', Server.connection);
