@@ -1,10 +1,11 @@
-import Workspace from './workspace';
+import Workspace from '../../../types/workspace';
 
 /**
  * Message can contain any data at payload
  */
 export type MessagePayload = {
   workspaces?: Workspace[] | null;
+  workspace?: Workspace | null;
 };
 
 /**
