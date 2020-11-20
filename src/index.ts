@@ -8,5 +8,5 @@ app.listen(Config.httpPort, () => {
 
 const transport: Transport = new Transport({
   port: Config.wsPort,
-  route: Config.wsPath,
+  path: Config.wsPath,
 });
