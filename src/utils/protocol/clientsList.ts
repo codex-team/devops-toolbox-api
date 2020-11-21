@@ -53,6 +53,15 @@ class ClientsList {
   public find(workspaceId: string): Client[] | undefined {
     return this.clients.filter(client => client.workspaceIds?.find(id => id == workspaceId));
   }
+
+  /**
+   * Authorization check
+   *
+   * @param clientSocket - client socket
+   */
+  public isAuthorized(clientSocket: ws): Client | undefined {
+    return this.clients.find(client => client.socket == clientSocket);
+  }
 }
 
 export default ClientsList;
