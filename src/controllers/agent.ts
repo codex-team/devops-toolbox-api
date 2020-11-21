@@ -1,10 +1,9 @@
 import express from 'express';
 import WorkspacesService from '../services/workspace';
-import ClientsList from '../utils/clientsList';
+import ClientsList from '../utils/protocol/clientsList';
 import Transport from '../utils/protocol/transport';
-import { Workspace, Client } from '../types';
-import MessageCreator from '../utils/protocol/messageCreator';
-
+import { Workspace } from '../types';
+import { Client } from '../utils/protocol/types';
 /**
  * Agent controller
  */
@@ -21,12 +20,7 @@ export default class AgentController {
     if (workspace) {
       const clients: Client[] | undefined = ClientsList.getAll().find(workspace._id.toString());
 
-      clients?.forEach(client => Transport.send(client.socket, MessageCreator.create(
-        'workspace-update',
-        null,
-        {
-          workspace,
-        })));
+      clients?.forEach(client => Transport.send(client, 'workspace-update', { workspace }));
     }
 
     res.json({
