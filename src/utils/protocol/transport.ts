@@ -1,20 +1,23 @@
 import ws from 'ws';
-import express from 'express';
 import WorkspacesService from '../../services/workspace';
 import WorkspacesController from '../../controllers/workspaces';
-import ClientsList from '../clientsList';
-import { Client } from '../../types';
-import { TransportOptions, OutgoingMessage, ResponseMessage, MessagePayload, IncomingMessage } from './types';
-import MessageCreator from './messageCreator';
+import ClientsList from './clientsList';
+import { Client, TransportOptions, OutgoingMessage, ResponseMessage, MessagePayload, IncomingMessage } from './types';
+import http from 'http';
 
 /**
  * Class Transport (Transport level)
  */
 export default class Transport {
   /**
-   * @private
+   * @private clients - Currently connected clients
    */
   private static clients: ClientsList = ClientsList.getAll();
+
+  /**
+   * @private wsServer: websocket server
+   */
+  private readonly wsServer: ws.Server;
 
   /**
    * Constructor
@@ -22,26 +25,46 @@ export default class Transport {
    * @param options - Transport options
    */
   constructor(options: TransportOptions) {
-    const server = new ws.Server({
-      port: options.port,
-      path: options.path,
-    }, () => {
+    this.wsServer = new ws.Server(options, () => {
       console.log(`⚡️[server]: Server is running at ws://localhost:${options.port}/${options.path}`);
     });
 
     /**
      *  Client connects
      */
-    server.on('connection', this.connection);
+    this.wsServer.on('connection', this.onconnection);
   }
 
   /**
-   * Method for sending a messages to the client
+   * Method for sending a messages initiated by the API
+   *
+   * @param client - client to whom the message is sending
+   * @param type - type of message
+   * @param payload - any payload
+   */
+  public static send(client: Client, type: string, payload: MessagePayload): void {
+    const message: OutgoingMessage = {
+      type,
+      payload,
+      messageId: null,
+    };
+
+    client.socket.send(JSON.stringify(message));
+  }
+
+  /**
+   * Method for sending a response
    *
    * @param socket - client
-   * @param message - message
+   * @param messageId - message id which we use to send response with this id
+   * @param payload - any payload
    */
-  public static send(socket: ws, message: ResponseMessage | OutgoingMessage): void {
+  public static respond(socket: ws, messageId: string, payload: MessagePayload): void {
+    const message: ResponseMessage = {
+      payload,
+      messageId,
+    };
+
     socket.send(JSON.stringify(message));
   }
 
@@ -49,13 +72,14 @@ export default class Transport {
    * Method for connection event
    *
    * @param socket - socket
-   * @param req - additional GET request from client
+   * @param request - additional GET request from client
    */
-  public async connection(socket: ws, req: express.Request): Promise<void> {
+  private onconnection = async (socket: ws, request: http.IncomingMessage): Promise<void> => {
     /**
      * Connected client's authorization token
      */
-    const authToken: string | undefined = req.headers.authorization;
+
+    const authToken: string | undefined = request.headers.authorization;
 
     /**
      * Connected client's workspaces list
@@ -75,7 +99,6 @@ export default class Transport {
     };
 
     Transport.clients.add(client);
-
     /**
      * Connected client's workspaces list
      */
@@ -106,13 +129,11 @@ export default class Transport {
 
     switch (dataObj.type) {
       case 'getWorkspaces':
-        payload.workspaces = await WorkspacesController.getWorkspaces();
+        payload.workspaces = await WorkspacesController.getWorkspaces(dataObj.payload.authToken);
         break;
     }
 
-    const message: ResponseMessage | OutgoingMessage = MessageCreator.create(dataObj.type, dataObj.messageId, payload);
-
-    Transport.send(this, message);
+    Transport.respond(this, dataObj.messageId, payload);
   }
 
   /**
