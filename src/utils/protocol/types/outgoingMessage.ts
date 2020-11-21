@@ -5,7 +5,11 @@ import { Message } from './message';
  */
 interface OutgoingMessage extends Message {
   /**
-   * Type of request like 'getWorkspaces' and etc. (If API send message then type is 'workspace-update')
+   * If API send message then messageId is null
+   */
+  messageId: null;
+  /**
+   * Type of message
    */
   type: string;
 }

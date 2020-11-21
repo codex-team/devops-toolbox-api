@@ -5,9 +5,9 @@ import { Message } from './message';
  */
 interface ResponseMessage extends Message {
   /**
-   * Message id, which we use to send response with this id (If API send message then messageId is null)
+   * Message id which we use to send response with this id
    */
-  messageId: string | null;
+  messageId: string;
 }
 
 export default ResponseMessage;

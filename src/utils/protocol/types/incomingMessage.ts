@@ -5,7 +5,7 @@ import RequestMessage from './requestMessage';
  */
 interface IncomingMessage extends RequestMessage {
   /**
-   * Type of request like 'getWorkspaces' and etc.
+   * Type of request
    */
   type: string;
 }
