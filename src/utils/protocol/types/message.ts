@@ -3,10 +3,7 @@ import Workspace from '../../../types/workspace';
 /**
  * Message can contain any data at payload
  */
-export type MessagePayload = {
-  workspaces?: Workspace[] | null;
-  workspace?: Workspace | null;
-};
+export type MessagePayload = { [key: string]: any }
 
 /**
  * Any client-server message should fit this structure
