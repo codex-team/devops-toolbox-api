@@ -14,6 +14,16 @@ export interface AuthData {
 
 type AuthRequestPayload = {[key: string]: string | number }
 
+/**
+ * All socket messages supported by Transport should have
+ *  'messageId' and 'type' as string
+ *  and
+ *  'payload' as object
+ *
+ * But before the type-validation we should treat them as possible invalid with unknown types
+ */
+type PossibleInvalidMessage = Record<string, any>;
+
 export interface TransportOptions {
   port?: number;
   onAuth: (authRequestPayload: AuthRequestPayload) => Promise<AuthData>;
@@ -22,8 +32,10 @@ export interface TransportOptions {
 
 /**
  * Class Transport (Transport level)
- * 
- * @todo string connections only from /client route
+ *
+ * @todo strict connections only from /client route
+ * @todo use Logger instead of console
+ * @todo send errors via OutgoingMessage
  */
 export class Transport {
   private clients: ConnectedClients = new ConnectedClients();
@@ -103,7 +115,7 @@ export class Transport {
       if (error instanceof CriticalError) {
         socket.close(CloseEventCode.UnsupportedData, error.message);
       } else {
-        socket.send(JSON.stringify('Message Format Error: ' + error.message));
+        socket.send('Message Format Error: ' + error.message);
 
         return;
       }
@@ -127,7 +139,7 @@ export class Transport {
      * 2. If the 'authorize' message wan not accepted for 5 sec after connection, then close connection.
      * 4. Authorisation should be implemented outside.
      * 4. If the client is already authorized, we shouldn't accept the 'authorize' request.
-     * 5. 
+     * 5.
      */
 
     // if (!alreadyConnected) {
@@ -177,13 +189,34 @@ export class Transport {
       throw new MessageParseError(parsingError.message);
     }
 
-    if (!parsedMessage.messageId) {
-      throw new MessageFormatError('Message id missed');
-    }
+    /**
+     * This fields MUST exist in a message
+     */
+    const requiredMessageFields = ['messageId', 'type', 'payload'];
 
-    if (parsedMessage.payload === undefined) {
-      throw new MessageFormatError('Message paylaod missed');
-    }
+    requiredMessageFields.forEach((field) => {
+      if ((parsedMessage as PossibleInvalidMessage)[field] === undefined) {
+        throw new MessageFormatError(`"${field}" field missed`);
+      }
+    });
+
+     /**
+     * Field -> type validation
+     */
+    const fieldTypes = {
+      messageId: 'string',
+      type: 'string',
+      payload: 'object',
+    };
+
+    Object.entries(fieldTypes).forEach(([name, type]) => {
+      const value = (parsedMessage as PossibleInvalidMessage)[name];
+
+      // eslint-disable-next-line valid-typeof
+      if (typeof value !== type) {
+        throw new MessageFormatError(`"${name}" should be ${type === 'object' ? 'an' : 'a'} ${type}`);
+      }
+    });
 
     return parsedMessage;
   }
