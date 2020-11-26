@@ -5,14 +5,10 @@ import ConnectedClients from './connectedClients';
 // import { Client, TransportOptions, OutgoingMessage, ResponseMessage, MessagePayload, IncomingMessage } from './types';
 import http from 'http';
 import { CriticalError, MessageFormatError, MessageParseError } from './errors';
-import { IncomingMessage } from './types';
+import { IncomingMessage, OutgoingMessage } from './types';
 import { CloseEventCode } from './closeEvent';
 import Client from './client';
-
-export interface AuthData {
-}
-
-type AuthRequestPayload = {[key: string]: string | number }
+import { AuthData, AuthRequestPayload } from './types/auth';
 
 /**
  * All socket messages supported by Transport should have
@@ -26,12 +22,21 @@ type PossibleInvalidMessage = Record<string, any>;
 
 export interface TransportOptions {
   port?: number;
+
   onAuth: (authRequestPayload: AuthRequestPayload) => Promise<AuthData>;
   onMessage: (message: IncomingMessage) => Promise<void>;
+
+  /**
+   * Allows to disable validation/authorisation and other warning messages
+   */
+  disableLogs?: boolean;
 }
 
 /**
- * Class Transport (Transport level)
+ * ヽ(͡◕ ͜ʖ ͡◕)ﾉ
+ *
+ * Class Transport (Transport level + Presentation level)
+ *
  *
  * @todo strict connections only from /client route
  * @todo use Logger instead of console
@@ -58,7 +63,7 @@ export class Transport {
        */
       clientTracking: false,
     }, options), () => {
-      console.log(`⚡️[server]: Server is running at ws://localhost:${options.port}}`);
+      this.log(`Server is running at ws://localhost:${options.port}}`);
     });
 
     /**
@@ -66,11 +71,22 @@ export class Transport {
      */
     this.wsServer.on('connection', (socket: ws, request: http.IncomingMessage) => {
       /**
-       * Connected client's workspaces list
+       * We will close the socket if there is no messaegs for 3 seconds
        */
+      let msgWaiter: NodeJS.Timeout;
+      const msgWaitingTime = 3000;
+
       socket.on('message', (message: ws.Data) => {
+        if (msgWaiter) {
+          clearTimeout(msgWaiter);
+        }
+
         this.onmessage(socket, message);
       });
+
+      msgWaiter = setTimeout(() => {
+        socket.close(CloseEventCode.TryAgainLater, 'Authorization requiered');
+      }, msgWaitingTime);
     });
   }
 
@@ -102,95 +118,95 @@ export class Transport {
    *
    * @param socket - socket
    * @param data - message data
-   * @private
    */
   private async onmessage(socket: ws, data: ws.Data): Promise<void> {
-    let parsedMessage: IncomingMessage;
-
     try {
-      parsedMessage = this.parseAndValidateMessage(data as string);
+      this.validateMessage(data as string);
     } catch (error) {
-      console.log(`Wrong message accepted: ${error.message} `, data);
+      this.log(`Wrong message accepted: ${error.message} `, data);
 
       if (error instanceof CriticalError) {
         socket.close(CloseEventCode.UnsupportedData, error.message);
       } else {
         socket.send('Message Format Error: ' + error.message);
-
-        return;
       }
+
+      return;
     }
 
+    const message = JSON.parse(data as string);
+    const isFirstMessage = !this.clients.exists((client: Client) => client.socket === socket);
 
-
-
-    // this.authorizeClient()
-
-    // const socketId = Date.now();
-    const alreadyConnected = this.clients.find((client: Client) => client.socket === socket);
-
-    console.log('alreadyConnected', alreadyConnected);
-
-
-
-
-    /**
-     * 1. The first message should be 'authorize'
-     * 2. If the 'authorize' message wan not accepted for 5 sec after connection, then close connection.
-     * 4. Authorisation should be implemented outside.
-     * 4. If the client is already authorized, we shouldn't accept the 'authorize' request.
-     * 5.
-     */
-
-    // if (!alreadyConnected) {
-    //   if (message.type !== 'authorize') {
-    //     socket.close(1007, 'Authentication required');
-    //   }
-
-    //   try {
-    //     const authData = await this.options.onAuth(message.payload);
-
-    //     this.clients.add(new Client(
-    //       socket,
-    //       authData
-    //     ));
-    //   } catch (error) {
-    //     socket.close(1007, 'Authentication failed');
-    //   }
-    // } else {
-    //   const response = await this.options.onMessage(message.payload);
-    // }
-
-    // if (!this.connectedClients.has(socketId)){
-    //   this.connectedClients.set(socketId, socket);
-    // }
-
-    // console.log('ok', this.wsServer.clients);
-    // console.log('map', this.connectedClients  );
+    if (isFirstMessage) {
+      this.handleFirstMessage(socket, message);
+    }
   }
 
   /**
-   * Chech if passed object fits the protocol message format
+   * Process the first message:
+   *  - check auhtorisation
+   *  - save client
    *
-   * @param message - object got from client
+   * @param socket - connected socket
+   * @param message - accepted message
    */
-  private parseAndValidateMessage(message: string): IncomingMessage {
+  private async handleFirstMessage(socket: ws, message: IncomingMessage): Promise<void> {
+    if (message.type !== 'authorize') {
+      socket.close(CloseEventCode.PolicyViolation, 'Unauthorized');
+
+      return;
+    }
+
+    try {
+      const authData = await this.options.onAuth(message.payload);
+
+      console.log('success auth', authData)
+      const clientToSave = new Client(socket, authData);
+
+      this.clients.add(clientToSave);
+
+      /**
+       * Respond with success message and auth data
+       */
+      socket.send(JSON.stringify({
+        type: 'auth-success',
+        payload: authData,
+      } as OutgoingMessage));
+    } catch (error) {
+      socket.close(CloseEventCode.PolicyViolation, 'Authorization failed: ' + error.message);
+    }
+  }
+
+  /**
+   * Chech if passed message fits the protocol format.
+   * Will throw an error if case of problems.
+   * If everthing is ok, return void
+   *
+   * @param message - string got from client by socket
+   */
+  private validateMessage(message: string): void {
+    /**
+     * Check for message type
+     */
     if (typeof message !== 'string') {
       throw new MessageParseError('Unsupported data');
     }
 
+    /**
+     * Check for JSON validness
+     */
     let parsedMessage: IncomingMessage;
 
     try {
       parsedMessage = JSON.parse(message) as IncomingMessage;
     } catch (parsingError) {
-      console.error('Message parsing error', parsingError.message);
+      this.log('Message parsing error: ' + parsingError.message);
 
       throw new MessageParseError(parsingError.message);
     }
 
     /**
-     * This fields MUST exist in a message
+     * Check for required fields
      */
     const requiredMessageFields = ['messageId', 'type', 'payload'];
 
@@ -200,8 +216,8 @@ export class Transport {
       }
     });
 
-     /**
-     * Field -> type validation
+    /**
+     * Check fields type
      */
     const fieldTypes = {
       messageId: 'string',
@@ -217,8 +233,26 @@ export class Transport {
         throw new MessageFormatError(`"${name}" should be ${type === 'object' ? 'an' : 'a'} ${type}`);
       }
     });
+  }
 
-    return parsedMessage;
+  /**
+   * Log some string
+   *
+   * @param text - what to log
+   * @param context - additional data to log
+   */
+  private log(text: string, context?: unknown): void {
+    const prefix = 'CTProto ♥';
+
+    if (this.options.disableLogs) {
+      return;
+    }
+
+    if (context === undefined) {
+      console.log(`${prefix} ${text}`);
+    } else {
+      console.log(`${prefix} ${text}`, context);
+    }
   }
 
   /**

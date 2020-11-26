@@ -24,7 +24,7 @@ export enum CloseEventCode {
   UnsupportedData = 1003,
 
   /**
-   * Reserved.  Indicates that no status code was provided even though one was expected.
+   * Reserved. Indicates that no status code was provided even though one was expected.
    */
   NoStatusReceived = 1005,
 

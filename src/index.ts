@@ -33,7 +33,7 @@ const transport: Transport = new Transport({
     const workspaces = await WorkspacesService.find({ authToken });
 
     if (!workspaces?.length) {
-      throw new Error('User has no workspace');
+      throw new Error('Wrong auth token passed');
     }
 
     return {

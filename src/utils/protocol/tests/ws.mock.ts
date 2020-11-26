@@ -8,14 +8,19 @@ export const socketClose = jest.fn();
 /**
  * Socket .send(message: string) mock
  */
-export const socketSend = jest.fn();
+export const socketSend = jest.fn((message: string) => {
+  console.log(`socket.send("${message})"`);
+});
 
 /**
  * Creates fake 'ws' library and imitate socket message event with passed payload.
  *
- * @param message - any payload data as it can be got from socket
+ * @param message - any payload data as it can be got from socket.
+ *                  If undefined, there will be no message imitated
+ *
+ * @param messageSeries - allows to pass message series (list of messges to call it one-by-one)
  */
-export function createWsMockWithMessage(message: unknown): typeof ws {
+export function createWsMockWithMessage(message: unknown, messageSeries?: unknown[]): typeof ws {
   /**
    * This is a mock for
    * socket.on(event, callback);
@@ -26,8 +31,21 @@ export function createWsMockWithMessage(message: unknown): typeof ws {
    * In tests it will trigger the 'onmessage' handler.
    */
   const socketOnMock = jest.fn((event: string, callback: Function) => {
-    // console.log(`socket.on("${event}") called`);
-    callback(message);
+    /**
+     * Call the 'onmessage' callback with passed message
+     */
+    if (message !== undefined) {
+      callback(message);
+    }
+
+    /**
+     * If there are several messages, call them one-by-one
+     */
+    if (messageSeries !== undefined) {
+      for (let i = 0, len = messageSeries.length; i < len; i++) {
+        callback(messageSeries[i]);
+      }
+    }
   });
 
   /**
@@ -51,7 +69,6 @@ export function createWsMockWithMessage(message: unknown): typeof ws {
    * });
    */
   const serverOn = jest.fn((event, callback) => {
-    // console.log(`server.on("${event}") called`);
     callback(socketMock);
   });
 

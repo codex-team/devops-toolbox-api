@@ -1,15 +1,14 @@
 import ws from 'ws';
+import { AuthData } from './types/auth';
 
 /**
- * Represents the connected client 
+ * Represents the connected client
  */
 export default class Client {
-
   public authData: object = {};
-  public socketId = '';
   public socket: ws;
-  
-  constructor(socket, authData){
+
+  constructor(socket: ws, authData: AuthData) {
     this.socket = socket;
     this.authData = authData;
   }
