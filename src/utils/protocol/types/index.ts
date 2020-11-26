@@ -1,17 +1,18 @@
 
-import IncomingMessage from './incomingMessage';
-import { Message, MessagePayload } from './message';
-import OutgoingMessage from './outgoingMessage';
-import RequestMessage from './requestMessage';
-import ResponseMessage from './responseMessage';
+import {
+  Message,
+  MessagePayload,
+  NewMessage,
+  ResponseMessage,
+  PossibleInvalidMessage,
+} from './message';
 import Client from '../client';
 
 export {
-  IncomingMessage,
   MessagePayload,
   Message,
-  OutgoingMessage,
+  NewMessage,
   ResponseMessage,
-  RequestMessage,
-  Client
+  PossibleInvalidMessage,
+  Client,
 };

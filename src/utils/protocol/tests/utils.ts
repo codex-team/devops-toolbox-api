@@ -1,5 +1,13 @@
 import { nanoid } from 'nanoid';
-import { IncomingMessage } from '../types';
+import { NewMessage } from '../types';
+
+
+/**
+ * Generates message id in CTProto format
+ */
+export function createMessageId(): string {
+  return nanoid(10);
+}
 
 /**
  * Return message in format of protocol.
@@ -11,9 +19,9 @@ import { IncomingMessage } from '../types';
 export function createMessage({ type, payload }: { type: string; payload: object }): string {
   return JSON.stringify(
     {
-      messageId: nanoid(10),
+      messageId: createMessageId(),
       type,
       payload,
-    } as IncomingMessage
+    } as NewMessage
   );
 }

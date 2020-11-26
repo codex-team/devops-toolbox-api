@@ -2,7 +2,6 @@ import { Transport, TransportOptions } from '../transport';
 import { createWsMockWithMessage, socketClose, socketSend } from './ws.mock';
 import { createMessage } from './utils';
 import { CloseEventCode } from '../closeEvent';
-import { AuthData } from '../types/auth';
 
 /**
  * Mock of external onAuth method that will do app-related authorisation
@@ -27,7 +26,7 @@ function createTransportWithFirstMessage(message?: {type: string; payload: objec
   return new Transport({
     onAuth: onAuthMock,
     onMessage: onMessageMock,
-    // disableLogs: true,
+    disableLogs: true,
   } as TransportOptions, new ws.Server());
 }
 
@@ -42,7 +41,7 @@ describe('Transport', () => {
     jest.useFakeTimers();
   });
 
-  describe('Authorisation', () => {
+  describe('Authorization', () => {
     test('should break the connection if the frist message is not an «authorize»', () => {
       /**
        * Imitate the message with type 'some-action'
@@ -143,27 +142,60 @@ describe('Transport', () => {
       } as TransportOptions, new ws.Server());
 
       expect(successfullOnAuth).toBeCalledWith(authRequestMock);
-      // expect(socketSend).toBeCalledWith(expect.stringMatching(/type="auth-success"/));
-      expect(socketSend).toBeCalled();
+
+      /**
+       * Waiting when onAuth() will be resolved...   (along with 'onmessage')
+       *
+       * We can't do it right way - using 'await' - because we don't have an access to the 'onmessage' method.
+       */
+      setTimeout(() => {
+        /**
+         * We don't have an access to generated messageId, so we'll check only 'type' and 'payload'
+         */
+        expect(socketSend).toHaveBeenCalledWith(expect.stringMatching(new RegExp(`"type":"auth-success"`)));
+        expect(socketSend).toHaveBeenCalledWith(expect.stringMatching(new RegExp(`"payload": ${JSON.stringify(authDataMock)}`)));
+      }, 50);
     });
 
     test('should save authorized data to the authData of a Client', () => {
-      expect(true).toBe(true);
-    });
+      const authRequestMock = {
+        token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
+      };
+      const authDataMock = {
+        user: '1234',
+      };
+      const successfullOnAuth = jest.fn((_authRequestPaylaod) => {
+        return Promise.resolve(authDataMock);
+      });
 
-    test('should ingore the «authorize» message if client is already authorised', () => {
-      expect(true).toBe(true);
+      const ws = createWsMockWithMessage(createMessage({
+        type: 'authorize',
+        payload: authRequestMock,
+      }));
+
+      const transport = new Transport({
+        onAuth: successfullOnAuth,
+        onMessage: onMessageMock,
+        disableLogs: true,
+      } as TransportOptions, new ws.Server());
+
+      /**
+       * Waiting when onAuth() will be resolved...   (along with 'onmessage')
+       *
+       * We can't do it right way - using 'await' - because we don't have an access to the 'onmessage' method.
+       */
+      setTimeout(() => {
+        const savedClient = transport.clients.find(client => client.authData === authDataMock);
+
+        expect(savedClient).toBeDefined();
+      }, 50);
     });
 
     /**
      * Check the second message accepting
      */
     describe('accepting the second message', () => {
-      test('should call the "onMessage()" after succeeded auth', () => {
-        const secondMessagePayload = {
-          someData: '123',
-        };
-
+      test('should ingore the «authorize» message if client is already authorised', () => {
         /**
          * Imitate accpeting two messages
          */
@@ -175,8 +207,10 @@ describe('Transport', () => {
             },
           }),
           createMessage({
-            type: 'some-other-type',
-            payload: secondMessagePayload,
+            type: 'authorize',
+            payload: {
+              token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
+            },
           }),
         ];
         const ws = createWsMockWithMessage(undefined, messageSeries);
@@ -185,10 +219,17 @@ describe('Transport', () => {
         new Transport({
           onAuth: onAuthMock,
           onMessage: onMessageMock,
-          // disableLogs: true,
+          disableLogs: true,
         } as TransportOptions, new ws.Server());
 
-        expect(onMessageMock).toBeCalledWith(secondMessagePayload);
+        /**
+         * Message series will be processed with some delay (see ws.mock.ts@socketOnMock)
+         * Wait until all messages will be processed.
+         */
+        setTimeout(() => {
+          expect(onAuthMock).toBeCalledTimes(1); // accept only the first authorize request
+          expect(onMessageMock).toBeCalledTimes(0); // ignore the second
+        }, 100);
       });
     });
   });

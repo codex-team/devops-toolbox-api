@@ -8,9 +8,7 @@ export const socketClose = jest.fn();
 /**
  * Socket .send(message: string) mock
  */
-export const socketSend = jest.fn((message: string) => {
-  console.log(`socket.send("${message})"`);
-});
+export const socketSend = jest.fn();
 
 /**
  * Creates fake 'ws' library and imitate socket message event with passed payload.
@@ -43,7 +41,13 @@ export function createWsMockWithMessage(message: unknown, messageSeries?: unknow
      */
     if (messageSeries !== undefined) {
       for (let i = 0, len = messageSeries.length; i < len; i++) {
-        callback(messageSeries[i]);
+        /**
+         * We use little timeout because it real-app messages will be processed with async/await.
+         * Without this timeout they will be processed at same time.
+         */
+        setTimeout(() => {
+          callback(messageSeries[i]);
+        }, i * 10);
       }
     }
   });

@@ -1,30 +1,18 @@
 import ws from 'ws';
-import WorkspacesService from '../../services/workspace';
-import WorkspacesController from '../../controllers/workspaces';
+
 import ConnectedClients from './connectedClients';
-// import { Client, TransportOptions, OutgoingMessage, ResponseMessage, MessagePayload, IncomingMessage } from './types';
 import http from 'http';
 import { CriticalError, MessageFormatError, MessageParseError } from './errors';
-import { IncomingMessage, OutgoingMessage } from './types';
 import { CloseEventCode } from './closeEvent';
 import Client from './client';
 import { AuthData, AuthRequestPayload } from './types/auth';
-
-/**
- * All socket messages supported by Transport should have
- *  'messageId' and 'type' as string
- *  and
- *  'payload' as object
- *
- * But before the type-validation we should treat them as possible invalid with unknown types
- */
-type PossibleInvalidMessage = Record<string, any>;
+import { NewMessage, PossibleInvalidMessage, ResponseMessage } from './types';
 
 export interface TransportOptions {
   port?: number;
 
-  onAuth: (authRequestPayload: AuthRequestPayload) => Promise<AuthData>;
-  onMessage: (message: IncomingMessage) => Promise<void>;
+  onAuth: (authRequestPayload: AuthRequestPayload) => AuthData | Promise<AuthData>;
+  onMessage: (message: NewMessage) => Promise<object>;
 
   /**
    * Allows to disable validation/authorisation and other warning messages
@@ -40,12 +28,24 @@ export interface TransportOptions {
  *
  * @todo strict connections only from /client route
  * @todo use Logger instead of console
- * @todo send errors via OutgoingMessage
+ * @todo send errors via NewMessage
  */
 export class Transport {
-  private clients: ConnectedClients = new ConnectedClients();
+  /**
+   * Manager of currently connected clients
+   * Allows to find, send and other manipulations.
+   */
+  public clients: ConnectedClients = new ConnectedClients();
+
+  /**
+   * Instance of trasport-layer framework
+   * In our case, this is a 'ws' server
+   */
   private readonly wsServer: ws.Server;
-  private connectedClients: Client[] = [];
+
+  /**
+   * Configuration options passed on Transport initialization
+   */
   private options: TransportOptions;
 
   /**
@@ -139,6 +139,8 @@ export class Transport {
 
     if (isFirstMessage) {
       this.handleFirstMessage(socket, message);
+    } else {
+      this.handleAuhtorizedMessage(socket, message);
     }
   }
 
@@ -150,7 +152,7 @@ export class Transport {
    * @param socket - connected socket
    * @param message - accepted message
    */
-  private async handleFirstMessage(socket: ws, message: IncomingMessage): Promise<void> {
+  private async handleFirstMessage(socket: ws, message: NewMessage): Promise<void> {
     if (message.type !== 'authorize') {
       socket.close(CloseEventCode.PolicyViolation, 'Unauthorized');
 
@@ -159,8 +161,6 @@ export class Transport {
 
     try {
       const authData = await this.options.onAuth(message.payload);
-
-      console.log('success auth', authData)
       const clientToSave = new Client(socket, authData);
 
       this.clients.add(clientToSave);
@@ -169,11 +169,44 @@ export class Transport {
        * Respond with success message and auth data
        */
       socket.send(JSON.stringify({
-        type: 'auth-success',
+        messageId: message.type,
         payload: authData,
-      } as OutgoingMessage));
+      } as ResponseMessage));
     } catch (error) {
       socket.close(CloseEventCode.PolicyViolation, 'Authorization failed: ' + error.message);
+    }
+  }
+
+  /**
+   * Process not-first message.
+   *
+   * @param socket - connected socket
+   * @param message - accepted message
+   */
+  private async handleAuhtorizedMessage(socket: ws, message: NewMessage): Promise<void> {
+    if (message.type == 'authorize') {
+      return;
+    }
+
+    try {
+      const response = await this.options.onMessage(message);
+
+      /**
+       * Controller may not returning anything.
+       */
+      if (!response) {
+        return;
+      }
+
+      /**
+       * Respond with payload got from the onMessage handler
+       */
+      socket.send(JSON.stringify({
+        messageId: message.messageId,
+        payload: response,
+      } as ResponseMessage));
+    } catch (error) {
+      this.log('Internal error while processing a message: ', error.message);
     }
   }
 
@@ -195,10 +228,10 @@ export class Transport {
     /**
      * Check for JSON validness
      */
-    let parsedMessage: IncomingMessage;
+    let parsedMessage: NewMessage;
 
     try {
-      parsedMessage = JSON.parse(message) as IncomingMessage;
+      parsedMessage = JSON.parse(message) as NewMessage;
     } catch (parsingError) {
       this.log('Message parsing error: ' + parsingError.message);
 
@@ -211,7 +244,7 @@ export class Transport {
     const requiredMessageFields = ['messageId', 'type', 'payload'];
 
     requiredMessageFields.forEach((field) => {
-      if ((parsedMessage as PossibleInvalidMessage)[field] === undefined) {
+      if ((parsedMessage as unknown as PossibleInvalidMessage)[field] === undefined) {
         throw new MessageFormatError(`"${field}" field missed`);
       }
     });
@@ -226,7 +259,7 @@ export class Transport {
     };
 
     Object.entries(fieldTypes).forEach(([name, type]) => {
-      const value = (parsedMessage as PossibleInvalidMessage)[name];
+      const value = (parsedMessage as unknown as PossibleInvalidMessage)[name];
 
       // eslint-disable-next-line valid-typeof
       if (typeof value !== type) {

@@ -1,9 +1,14 @@
 import Client from './client';
 
+/**
+ * Method for finding a client by some external logic.
+ * Will be passed to the Array.find() method
+ */
 type ClientQueryCallback = (client: Client) => boolean;
 
 /**
- *
+ * Connected clients manager.
+ * Allows to find, send messages and so on
  */
 export default class ConnectedClients {
   private clients: Client[] = [];
@@ -18,7 +23,6 @@ export default class ConnectedClients {
 
     return this;
   }
-
 
   /**
    * Return client by query callback
