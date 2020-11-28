@@ -1,9 +1,9 @@
-/* eslint-disable no-new */ // to allow calling new Transport() without assigning
+/* eslint-disable no-new */ // to allow calling new CTProtoServer() without assigning
 
-import { Transport, TransportOptions } from '../server';
+import { CTProtoServer, CTProtoServerOptions } from '../server';
 import { createWsMockWithMessage, socketClose, socketSend } from './ws.mock';
 
-describe('Transport', () => {
+describe('CTProtoServer', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -11,7 +11,7 @@ describe('Transport', () => {
   /**
    * In all tests at this section, options are not used, so we mock it with empty values
    */
-  const transportConfig: TransportOptions = {
+  const transportConfig: CTProtoServerOptions = {
     onAuth: jest.fn(),
     onMessage: jest.fn(),
     disableLogs: true,
@@ -28,7 +28,7 @@ describe('Transport', () => {
       const socketMessage = new ArrayBuffer(0);
       const ws = createWsMockWithMessage(socketMessage);
 
-      new Transport(transportConfig, new ws.Server());
+      new CTProtoServer(transportConfig, new ws.Server());
 
       expect(socketClose).toBeCalledTimes(1);
     });
@@ -40,7 +40,7 @@ describe('Transport', () => {
       const socketMessage = 'some string but not a JSON';
       const ws = createWsMockWithMessage(socketMessage);
 
-      new Transport(transportConfig, new ws.Server());
+      new CTProtoServer(transportConfig, new ws.Server());
 
       expect(socketClose).toBeCalledTimes(1);
     });
@@ -52,7 +52,7 @@ describe('Transport', () => {
       const socketMessage = JSON.stringify({ foo: 'bar' });
       const ws = createWsMockWithMessage(socketMessage);
 
-      new Transport(transportConfig, new ws.Server());
+      new CTProtoServer(transportConfig, new ws.Server());
 
       expect(socketClose).toBeCalledTimes(0);
       expect(socketSend).toHaveBeenCalledWith('Message Format Error: "messageId" field missed');
@@ -65,7 +65,7 @@ describe('Transport', () => {
       const socketMessage = JSON.stringify({ messageId: '123' });
       const ws = createWsMockWithMessage(socketMessage);
 
-      new Transport(transportConfig, new ws.Server());
+      new CTProtoServer(transportConfig, new ws.Server());
 
       expect(socketClose).toBeCalledTimes(0);
       expect(socketSend).toHaveBeenCalledWith('Message Format Error: "type" field missed');
@@ -81,7 +81,7 @@ describe('Transport', () => {
       });
       const ws = createWsMockWithMessage(socketMessage);
 
-      new Transport(transportConfig, new ws.Server());
+      new CTProtoServer(transportConfig, new ws.Server());
 
       expect(socketClose).toBeCalledTimes(0);
       expect(socketSend).toHaveBeenCalledWith('Message Format Error: "payload" field missed');
@@ -98,7 +98,7 @@ describe('Transport', () => {
       });
       const ws = createWsMockWithMessage(socketMessage);
 
-      new Transport(transportConfig, new ws.Server());
+      new CTProtoServer(transportConfig, new ws.Server());
 
       expect(socketClose).toBeCalledTimes(0);
       expect(socketSend).toHaveBeenCalledWith('Message Format Error: "messageId" should be a string');
@@ -115,7 +115,7 @@ describe('Transport', () => {
       });
       const ws = createWsMockWithMessage(socketMessage);
 
-      new Transport(transportConfig, new ws.Server());
+      new CTProtoServer(transportConfig, new ws.Server());
 
       expect(socketClose).toBeCalledTimes(0);
       expect(socketSend).toHaveBeenCalledWith('Message Format Error: "type" should be a string');
@@ -132,10 +132,27 @@ describe('Transport', () => {
       });
       const ws = createWsMockWithMessage(socketMessage);
 
-      new Transport(transportConfig, new ws.Server());
+      new CTProtoServer(transportConfig, new ws.Server());
 
       expect(socketClose).toBeCalledTimes(0);
       expect(socketSend).toHaveBeenCalledWith('Message Format Error: "payload" should be an object');
     });
+  });
+
+  test('should send an error if «messageId» is invalid', () => {
+    /**
+     * Imitate the message with '«messageId»' that is not a string
+     */
+    const socketMessage = JSON.stringify({
+      messageId: 'authorize', // <-- invalid message id
+      payload: {},
+      type: 'some-type',
+    });
+    const ws = createWsMockWithMessage(socketMessage);
+
+    new CTProtoServer(transportConfig, new ws.Server());
+
+    expect(socketSend).toHaveBeenCalledWith('Message Format Error: Invalid message id');
+    expect(socketClose).toBeCalledTimes(0);
   });
 });

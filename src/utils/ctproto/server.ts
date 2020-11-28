@@ -21,7 +21,7 @@ export interface CTProtoServerOptions {
 
   /**
    * Method for socket authorization
-   * Will be called when cliend will send the 'authorize' request.
+   * Will be called when client will send the 'authorize' request.
    *
    * @param authRequestPayload - any app-related data for authorization.
    * @returns authorized client data
@@ -62,7 +62,7 @@ export class CTProtoServer {
   public clients: ClientsList = new ClientsList();
 
   /**
-   * Instance of trasport-layer framework
+   * Instance of transport-layer framework
    * In our case, this is a 'ws' server
    */
   private readonly wsServer: ws.Server;
@@ -84,7 +84,7 @@ export class CTProtoServer {
       port: options.port,
       path: options.path,
       /**
-       * Do not save clients in ws.clients propery
+       * Do not save clients in ws.clients property
        * because we will use own Map (this.ClientsList)
        */
       clientTracking: false,
@@ -95,9 +95,9 @@ export class CTProtoServer {
     /**
      *  Client connects
      */
-    this.wsServer.on('connection', (socket: ws, request: http.IncomingMessage) => {
+    this.wsServer.on('connection', (socket: ws, _request: http.IncomingMessage) => {
       /**
-       * We will close the socket if there is no messaegs for 3 seconds
+       * We will close the socket if there is no messages for 3 seconds
        */
       let msgWaiter: NodeJS.Timeout;
       const msgWaitingTime = 3000;
@@ -115,7 +115,7 @@ export class CTProtoServer {
       }, msgWaitingTime);
 
       /**
-       * Сlient disconnecting handler
+       * Client disconnecting handler
        */
       socket.on('close', () => this.onclose(socket));
 
@@ -135,6 +135,8 @@ export class CTProtoServer {
   private async onmessage(socket: ws, data: ws.Data): Promise<void> {
     try {
       this.validateMessage(data as string);
+
+      console.log('message is valid');
     } catch (error) {
       this.log(`Wrong message accepted: ${error.message} `, data);
 
@@ -153,13 +155,13 @@ export class CTProtoServer {
     if (isFirstMessage) {
       this.handleFirstMessage(socket, message);
     } else {
-      this.handleAuhtorizedMessage(socket, message);
+      this.handleAuthorizedMessage(socket, message);
     }
   }
 
   /**
    * Process the first message:
-   *  - check auhtorisation
+   *  - check authorization
    *  - save client
    *
    * @param socket - connected socket
@@ -196,7 +198,7 @@ export class CTProtoServer {
    * @param socket - connected socket
    * @param message - accepted message
    */
-  private async handleAuhtorizedMessage(socket: ws, message: NewMessage): Promise<void> {
+  private async handleAuthorizedMessage(socket: ws, message: NewMessage): Promise<void> {
     if (message.type == 'authorize') {
       return;
     }
@@ -224,13 +226,13 @@ export class CTProtoServer {
   }
 
   /**
-   * Chech if passed message fits the protocol format.
+   * Check if passed message fits the protocol format.
    * Will throw an error if case of problems.
-   * If everthing is ok, return void
+   * If everything is ok, return void
    *
    * @param message - string got from client by socket
    */
-  private validateMessage(message: string): void {
+  private validateMessage(message: unknown): void {
     /**
      * Check for message type
      */
@@ -279,6 +281,31 @@ export class CTProtoServer {
         throw new MessageFormatError(`"${name}" should be ${type === 'object' ? 'an' : 'a'} ${type}`);
       }
     });
+
+    /**
+     * Check message id for validness
+     */
+    if (!CTProtoServer.isMessageIdValid(parsedMessage.messageId)){
+      throw new MessageFormatError('Invalid message id');
+    }
+  }
+
+  /**
+   * Check message id for validness.
+   * It should be a 10 length URL-friendly string
+   *
+   * @param messageId - id to check
+   */
+  private static isMessageIdValid(messageId: string): boolean {
+    if (messageId.length !== 10){
+      return false;
+    }
+
+    if (!messageId.match(/^[A-Za-z0-9_-]{10}$/)){
+      return false;
+    }
+
+    return true;
   }
 
   /**

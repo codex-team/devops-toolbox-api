@@ -1,10 +1,4 @@
-/* eslint-disable no-new */
-
-import { Transport, TransportOptions } from '../server';
-import { createMessage } from './utils';
-import { createWsMockWithMessage, socketClose, socketOnCloseMock, socketSend } from './ws.mock';
-
-describe('Transport', () => {
+describe('CTProtoServer', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });

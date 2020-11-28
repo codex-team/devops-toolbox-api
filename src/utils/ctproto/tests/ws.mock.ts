@@ -11,11 +11,6 @@ export const socketSend = jest.fn();
 export const socketOnCloseMock = jest.fn();
 
 /**
- * Mock for socket.on("error", socketOnErrorMock) callback
- */
-export const socketOnErrorMock = jest.fn();
-
-/**
  * Socket .close() mock
  */
 export const socketClose = jest.fn(() => {
@@ -41,8 +36,6 @@ export function createWsMockWithMessage(message: unknown, messageSeries?: unknow
    * In tests it will trigger the 'onmessage' handler.
    */
   const socketOnMock = jest.fn((event: string, callback: Function) => {
-    console.log(`socket.on("${event}")`);
-
     if (event !== 'message') {
       return;
     }

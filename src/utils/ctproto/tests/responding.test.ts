@@ -1,7 +1,14 @@
-import { Transport, TransportOptions } from '../server';
+import { CTProtoServer, CTProtoServerOptions } from '../server';
 import { createWsMockWithMessage, socketSend } from './ws.mock';
 import { createMessage, createMessageId } from './utils';
 import { NewMessage } from '../types';
+
+/**
+ * These tests are now working properly!
+ * All the expects inside the setTimeout always pass.
+ * @todo Use end-to-end testing to test the responding logic
+ *
+ */
 
 /**
  * Mock of external onAuth method that will do app-related authorisation
@@ -13,7 +20,7 @@ const onAuthMock = jest.fn();
  */
 const onMessageMock = jest.fn();
 
-describe('Transport', () => {
+describe('CTProtoServer', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.clearAllTimers();
@@ -31,7 +38,7 @@ describe('Transport', () => {
       };
 
       /**
-       * Imitate accpeting two messages
+       * Imitate accepting two messages
        */
       const messageSeries = [
         createMessage({
@@ -48,11 +55,11 @@ describe('Transport', () => {
       const ws = createWsMockWithMessage(undefined, messageSeries);
 
       // eslint-disable-next-line no-new
-      new Transport({
+      new CTProtoServer({
         onAuth: onAuthMock,
         onMessage: onMessageMock,
         disableLogs: true,
-      } as TransportOptions, new ws.Server());
+      } as CTProtoServerOptions, new ws.Server());
 
       /**
        * Message series will be processed with some delay (see ws.mock.ts@socketOnMock)
@@ -64,7 +71,7 @@ describe('Transport', () => {
       }, 50);
     });
 
-    test('should send a response if the "onMessage" returns somethig', () => {
+    test('should send a response if the "onMessage" returns something', () => {
       const onMessageResponse = {
         someData: '123',
       };
@@ -74,7 +81,7 @@ describe('Transport', () => {
       const secondMessageId = createMessageId();
 
       /**
-       * Imitate accpeting two messages
+       * Imitate accepting two messages
        */
       const messageSeries = [
         createMessage({
@@ -92,11 +99,11 @@ describe('Transport', () => {
       const ws = createWsMockWithMessage(undefined, messageSeries);
 
       // eslint-disable-next-line no-new
-      new Transport({
+      new CTProtoServer({
         onAuth: onAuthMock,
         onMessage: onMessageWithReturnValue,
         disableLogs: true,
-      } as TransportOptions, new ws.Server());
+      } as CTProtoServerOptions, new ws.Server());
 
       /**
        * Message series will be processed with some delay (see ws.mock.ts@socketOnMock)
@@ -105,7 +112,7 @@ describe('Transport', () => {
       setTimeout(() => {
         expect(socketSend).toHaveBeenCalledWith(JSON.stringify({
           messageId: secondMessageId, // reply with id of the second message
-          paylaod: onMessageResponse, // pass data returned by onMessage
+          payload: onMessageResponse, // pass data returned by onMessage
         }));
       }, 50);
     });
@@ -116,7 +123,7 @@ describe('Transport', () => {
       });
 
       /**
-       * Imitate accpeting two messages
+       * Imitate accepting two messages
        */
       const messageSeries = [
         createMessage({
@@ -133,11 +140,11 @@ describe('Transport', () => {
       const ws = createWsMockWithMessage(undefined, messageSeries);
 
       // eslint-disable-next-line no-new
-      new Transport({
+      new CTProtoServer({
         onAuth: onAuthMock,
         onMessage: onMessageWithReturnValue,
         disableLogs: true,
-      } as TransportOptions, new ws.Server());
+      } as CTProtoServerOptions, new ws.Server());
 
       /**
        * Message series will be processed with some delay (see ws.mock.ts@socketOnMock)

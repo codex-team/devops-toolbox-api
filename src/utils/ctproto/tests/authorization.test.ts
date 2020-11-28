@@ -1,4 +1,4 @@
-import { Transport, TransportOptions } from '../server';
+import { CTProtoServer, CTProtoServerOptions } from '../server';
 import { createWsMockWithMessage, socketClose, socketSend } from './ws.mock';
 import { createMessage } from './utils';
 import { CloseEventCode } from '../closeEvent';
@@ -14,23 +14,23 @@ const onAuthMock = jest.fn();
 const onMessageMock = jest.fn();
 
 /**
- * Mock 'ws', create Transport with mocked 'ws'
+ * Mock 'ws', create CTProtoServer with mocked 'ws'
  * And imitate accepting the first message with passed data
  *
  * @param message - message to imitate its accepting
  */
-function createTransportWithFirstMessage(message?: {type: string; payload: object}): Transport {
+function createCTProtoServerWithFirstMessage(message?: {type: string; payload: object}): CTProtoServer {
   const socketMessage = message ? createMessage(message) : undefined;
   const ws = createWsMockWithMessage(socketMessage);
 
-  return new Transport({
+  return new CTProtoServer({
     onAuth: onAuthMock,
     onMessage: onMessageMock,
     disableLogs: true,
-  } as TransportOptions, new ws.Server());
+  } as CTProtoServerOptions, new ws.Server());
 }
 
-describe('Transport', () => {
+describe('CTProtoServer', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.clearAllTimers();
@@ -42,11 +42,11 @@ describe('Transport', () => {
   });
 
   describe('Authorization', () => {
-    test('should break the connection if the frist message is not an «authorize»', () => {
+    test('should break the connection if the first message is not an «authorize»', () => {
       /**
        * Imitate the message with type 'some-action'
        */
-      createTransportWithFirstMessage({
+      createCTProtoServerWithFirstMessage({
         type: 'some-action', // <-- not an 'authorize'
         payload: {},
       });
@@ -58,7 +58,7 @@ describe('Transport', () => {
       /**
        * Create transport, but do not pass any message to it
        */
-      createTransportWithFirstMessage();
+      createCTProtoServerWithFirstMessage();
 
       /**
        * At this point in time, the socket.close() shouldn't have been called yet
@@ -85,7 +85,7 @@ describe('Transport', () => {
       /**
        * Imitate the 'authorize' message
        */
-      createTransportWithFirstMessage({
+      createCTProtoServerWithFirstMessage({
         type: 'authorize',
         payload: authDataSample,
       });
@@ -108,11 +108,11 @@ describe('Transport', () => {
       }));
 
       // eslint-disable-next-line no-new
-      new Transport({
+      new CTProtoServer({
         onAuth: unsuccessfullOnAuth,
         onMessage: onMessageMock,
         disableLogs: true,
-      } as TransportOptions, new ws.Server());
+      } as CTProtoServerOptions, new ws.Server());
 
       expect(unsuccessfullOnAuth).toThrowError(appRealtedAuthError);
       expect(socketClose).toHaveBeenCalledWith(CloseEventCode.PolicyViolation, 'Authorization failed: ' + appRealtedAuthError.message);
@@ -135,11 +135,11 @@ describe('Transport', () => {
       }));
 
       // eslint-disable-next-line no-new
-      new Transport({
+      new CTProtoServer({
         onAuth: successfullOnAuth,
         onMessage: onMessageMock,
         disableLogs: true,
-      } as TransportOptions, new ws.Server());
+      } as CTProtoServerOptions, new ws.Server());
 
       expect(successfullOnAuth).toBeCalledWith(authRequestMock);
 
@@ -173,11 +173,11 @@ describe('Transport', () => {
         payload: authRequestMock,
       }));
 
-      const transport = new Transport({
+      const transport = new CTProtoServer({
         onAuth: successfullOnAuth,
         onMessage: onMessageMock,
         disableLogs: true,
-      } as TransportOptions, new ws.Server());
+      } as CTProtoServerOptions, new ws.Server());
 
       /**
        * Waiting when onAuth() will be resolved...   (along with 'onmessage')
@@ -216,11 +216,11 @@ describe('Transport', () => {
         const ws = createWsMockWithMessage(undefined, messageSeries);
 
         // eslint-disable-next-line no-new
-        new Transport({
+        new CTProtoServer({
           onAuth: onAuthMock,
           onMessage: onMessageMock,
           disableLogs: true,
-        } as TransportOptions, new ws.Server());
+        } as CTProtoServerOptions, new ws.Server());
 
         /**
          * Message series will be processed with some delay (see ws.mock.ts@socketOnMock)
