@@ -1,31 +1,24 @@
 import app from './app';
 import Config from './config';
-import { Transport, AuthData } from './utils/protocol/transport';
-import ws from 'ws';
-import Workspace from './types/workspace';
-import { IncomingMessage } from './utils/protocol/types';
+import { CTProtoServer } from './utils/ctproto/server';
+import { Workspace } from './types/workspace';
 import WorkspacesService from './services/workspace';
+import { DevopsToolboxAuthData, DevopsToolboxAuthRequest } from './types/auth';
+import { NewMessage } from './utils/ctproto/types';
+import { AuthRequestPayload } from './utils/ctproto/types/auth';
 
 app.listen(Config.httpPort, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${Config.httpPort}`);
 });
 
-interface DevopsToolboxAuthRequest {
-  token: string;
-}
-interface DevopsToolboxAuthData extends AuthData {
-  workspaceIds: string[];
-  userId?: string;
-}
-
-const transport: Transport = new Transport({
+const transport = new CTProtoServer({
   port: Config.wsPort,
   // path: '/config',
-  async onAuth(authRequestPayload): Promise<DevopsToolboxAuthData> {
+  async onAuth(authRequestPayload: AuthRequestPayload): Promise<DevopsToolboxAuthData> {
     /**
      * Connected client's authorization token
      */
-    const authToken: string = authRequestPayload.token.toString();
+    const authToken: string = (authRequestPayload as DevopsToolboxAuthRequest).token.toString();
 
     /**
      * Connected client's workspaces list
@@ -41,7 +34,7 @@ const transport: Transport = new Transport({
     };
   },
 
-  async onMessage(message: IncomingMessage): Promise<void> {
+  async onMessage(message: NewMessage): Promise<void | object> {
     switch (message.type) {
 
     }

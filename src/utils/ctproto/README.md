@@ -8,7 +8,7 @@ This is a JavaScript implementation example.
 
 CTProto uses WebSockets as transport-layer.
 
-After connection to the endpoit specified by application, you need to send the __authorisation__ message in 3 seconds. Otherwise, the connection will be closed.
+After connection to the endpoit specified by application, you need to send the __authorization__ message in 3 seconds. Otherwise, the connection will be closed.
 
 ## Communication
 

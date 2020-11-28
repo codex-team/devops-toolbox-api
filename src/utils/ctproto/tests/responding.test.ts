@@ -1,4 +1,4 @@
-import { Transport, TransportOptions } from '../transport';
+import { Transport, TransportOptions } from '../server';
 import { createWsMockWithMessage, socketSend } from './ws.mock';
 import { createMessage, createMessageId } from './utils';
 import { NewMessage } from '../types';
@@ -104,8 +104,8 @@ describe('Transport', () => {
        */
       setTimeout(() => {
         expect(socketSend).toHaveBeenCalledWith(JSON.stringify({
-          messageId: secondMessageId,
-          paylaod: onMessageResponse,
+          messageId: secondMessageId, // reply with id of the second message
+          paylaod: onMessageResponse, // pass data returned by onMessage
         }));
       }, 50);
     });

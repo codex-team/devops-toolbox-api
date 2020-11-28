@@ -1,6 +1,6 @@
 /* eslint-disable no-new */ // to allow calling new Transport() without assigning
 
-import { Transport, TransportOptions } from '../transport';
+import { Transport, TransportOptions } from '../server';
 import { createWsMockWithMessage, socketClose, socketSend } from './ws.mock';
 
 describe('Transport', () => {

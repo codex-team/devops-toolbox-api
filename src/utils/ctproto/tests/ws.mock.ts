@@ -1,14 +1,26 @@
 import ws from 'ws';
 
 /**
- * Socket .close() mock
- */
-export const socketClose = jest.fn();
-
-/**
  * Socket .send(message: string) mock
  */
 export const socketSend = jest.fn();
+
+/**
+ * Mock for socket.on("close", socketOnCloseMock) callback
+ */
+export const socketOnCloseMock = jest.fn();
+
+/**
+ * Mock for socket.on("error", socketOnErrorMock) callback
+ */
+export const socketOnErrorMock = jest.fn();
+
+/**
+ * Socket .close() mock
+ */
+export const socketClose = jest.fn(() => {
+  socketOnCloseMock();
+});
 
 /**
  * Creates fake 'ws' library and imitate socket message event with passed payload.
@@ -29,6 +41,12 @@ export function createWsMockWithMessage(message: unknown, messageSeries?: unknow
    * In tests it will trigger the 'onmessage' handler.
    */
   const socketOnMock = jest.fn((event: string, callback: Function) => {
+    console.log(`socket.on("${event}")`);
+
+    if (event !== 'message') {
+      return;
+    }
+
     /**
      * Call the 'onmessage' callback with passed message
      */

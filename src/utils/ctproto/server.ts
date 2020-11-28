@@ -1,18 +1,41 @@
 import ws from 'ws';
 
-import ConnectedClients from './connectedClients';
 import http from 'http';
 import { CriticalError, MessageFormatError, MessageParseError } from './errors';
 import { CloseEventCode } from './closeEvent';
 import Client from './client';
 import { AuthData, AuthRequestPayload } from './types/auth';
 import { NewMessage, PossibleInvalidMessage, ResponseMessage } from './types';
+import ClientsList from './clientsList';
 
-export interface TransportOptions {
+export interface CTProtoServerOptions {
+  /**
+   * WebSocket server port
+   */
   port?: number;
 
+  /**
+   * Allows to accept connection only from this route
+   */
+  path?: string;
+
+  /**
+   * Method for socket authorization
+   * Will be called when cliend will send the 'authorize' request.
+   *
+   * @param authRequestPayload - any app-related data for authorization.
+   * @returns authorized client data
+   */
   onAuth: (authRequestPayload: AuthRequestPayload) => AuthData | Promise<AuthData>;
-  onMessage: (message: NewMessage) => Promise<object>;
+
+  /**
+   * Method for handling messages
+   * Will be called on every message after authorization.
+   *
+   * @param message - full message data
+   * @returns optionally can return any data to respond to client
+   */
+  onMessage: (message: NewMessage) => Promise<void | object>;
 
   /**
    * Allows to disable validation/authorisation and other warning messages
@@ -29,13 +52,14 @@ export interface TransportOptions {
  * @todo strict connections only from /client route
  * @todo use Logger instead of console
  * @todo send errors via NewMessage
+ * @todo close broken connection ping-pong (https://github.com/websockets/ws#how-to-detect-and-close-broken-connections)
  */
-export class Transport {
+export class CTProtoServer {
   /**
    * Manager of currently connected clients
    * Allows to find, send and other manipulations.
    */
-  public clients: ConnectedClients = new ConnectedClients();
+  public clients: ClientsList = new ClientsList();
 
   /**
    * Instance of trasport-layer framework
@@ -46,7 +70,7 @@ export class Transport {
   /**
    * Configuration options passed on Transport initialization
    */
-  private options: TransportOptions;
+  private options: CTProtoServerOptions;
 
   /**
    * Constructor
@@ -54,15 +78,17 @@ export class Transport {
    * @param options - Transport options
    * @param WebSocketsServer - allows to override the 'ws' dependency. Used for mocking it in tests.
    */
-  constructor(options: TransportOptions, WebSocketsServer?: ws.Server) {
+  constructor(options: CTProtoServerOptions, WebSocketsServer?: ws.Server) {
     this.options = options;
-    this.wsServer = WebSocketsServer || new ws.Server(Object.assign({
+    this.wsServer = WebSocketsServer || new ws.Server({
+      port: options.port,
+      path: options.path,
       /**
        * Do not save clients in ws.clients propery
-       * because we will use own Map (this.connectedClients)
+       * because we will use own Map (this.ClientsList)
        */
       clientTracking: false,
-    }, options), () => {
+    }, () => {
       this.log(`Server is running at ws://localhost:${options.port}}`);
     });
 
@@ -87,31 +113,18 @@ export class Transport {
       msgWaiter = setTimeout(() => {
         socket.close(CloseEventCode.TryAgainLater, 'Authorization requiered');
       }, msgWaitingTime);
+
+      /**
+       * Сlient disconnecting handler
+       */
+      socket.on('close', () => this.onclose(socket));
+
+      /**
+       * Sockets error handler
+       */
+      socket.on('error', () => this.onerror(socket));
     });
   }
-
-  /**
-   * Method for connection event
-   *
-   * @param socket - socket
-   * @param request - additional GET request from client
-   */
-  // private onconnection = async (socket: ws): Promise<void> => {
-  //   /**
-  //    * Connected client's workspaces list
-  //    */
-  //   socket.on('message', this.onmessage);
-
-  //   /**
-  //    * Сlient disconnecting handler
-  //    */
-  //   socket.on('close', this.onclose);
-
-  //   /**
-  //    * Sockets error handler
-  //    */
-  //   socket.on('error', this.onerror);
-  // }
 
   /**
    * Method for message event
@@ -135,7 +148,7 @@ export class Transport {
     }
 
     const message = JSON.parse(data as string);
-    const isFirstMessage = !this.clients.exists((client: Client) => client.socket === socket);
+    const isFirstMessage = !this.clients.query((client: Client) => client.socket === socket).exists();
 
     if (isFirstMessage) {
       this.handleFirstMessage(socket, message);
@@ -289,22 +302,20 @@ export class Transport {
   }
 
   /**
-   * Method for close event
+   * Socket disconnection handler
    *
-   * @private
-   * @param this - socket
+   * @param socket - disconnected socket
    */
-  // private onclose(this: ws): void {
-  //   Transport.clients.remove(this);
-  // }
+  private onclose(socket: ws): void {
+    this.clients.query((client: Client) => client.socket === socket).remove();
+  }
 
   /**
-   * Method for error event
+   * Handler for socket connection error
    *
-   * @private
-   * @param this - socket
+   * @param socket - connected socket
    */
-  // private onerror(this: ws): void {
-  //   Transport.clients.remove(this);
-  // }
+  private onerror(socket: ws): void {
+    this.clients.query((client: Client) => client.socket === socket).remove();
+  }
 }

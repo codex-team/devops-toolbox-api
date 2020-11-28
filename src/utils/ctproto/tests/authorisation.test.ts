@@ -1,4 +1,4 @@
-import { Transport, TransportOptions } from '../transport';
+import { Transport, TransportOptions } from '../server';
 import { createWsMockWithMessage, socketClose, socketSend } from './ws.mock';
 import { createMessage } from './utils';
 import { CloseEventCode } from '../closeEvent';
@@ -185,9 +185,9 @@ describe('Transport', () => {
        * We can't do it right way - using 'await' - because we don't have an access to the 'onmessage' method.
        */
       setTimeout(() => {
-        const savedClient = transport.clients.find(client => client.authData === authDataMock);
+        const savedClientExists = transport.clients.query(client => client.authData === authDataMock).exists();
 
-        expect(savedClient).toBeDefined();
+        expect(savedClientExists).toBeTruthy();
       }, 50);
     });
 

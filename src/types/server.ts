@@ -3,19 +3,20 @@ import Service from './service';
 /**
  * Interface for server
  */
-interface Server {
+export default interface Server {
   /**
    * Server name
    */
   name: string;
+
   /**
-   * Server token
+   * Integration token
+   * given on server creation
    */
   token: string;
+
   /**
-   * Server services
+   * List of services running on the server
    */
   services: Service[];
-}
-
-export default Server;
+};
