@@ -19,15 +19,17 @@ To run application in Docker:
 
 ### REST API routes
 
-The REST API uses for communication between agents and the backend.
+The REST API used for communication between agents and the backend.
 
-All REST request requires the authorization via the `Authorization` header:
+__Authorization__
+
+All the REST request requires the authorization via the `Authorization` header:
 
 ```bash
 Authorization: Bearer <Integration Token>
 ```
 
-#### PUT `/services`
+#### `PUT /services`
 
 Route for updating the information about the services running of observed server.
 
@@ -35,7 +37,7 @@ Route for updating the information about the services running of observed server
 
 | Field | Type | Required | Description |
 | -- | -- | -- | -- |
-| `services` | _Service[]_ | yes | List of all found services |
+| `services` | _Service[]_ | yes | List of all found [services](docs/services.md) |
 
 ##### Example
 
@@ -63,7 +65,7 @@ Route for updating the information about the services running of observed server
 ##### Response
 
 | Field | Type | Description |
-| -- | -- | -- | -- |
+| -- | -- | -- |
 | `success` | _boolean_ | `true` on successful saving, otherwise `false` |
 | `workspace` | _Workspace_ | Updated workspace info |
 
@@ -71,7 +73,7 @@ Route for updating the information about the services running of observed server
 
 The communication between the backend and clients is going through the [CodeX Transport Protocol](src/utils/ctproto).
 
-All supported messages will be listed below:
+All supported messages will be listed below.
 
 #### `authorize`
 
@@ -98,6 +100,6 @@ Message for authorization required by protocol.
 ##### Response 
 
 | Field | Type | Description |
-| -- | -- | -- | -- |
+| -- | -- | -- |
 | `workspaceIds` | _string[]_ | Owned workspaces ids |
  
