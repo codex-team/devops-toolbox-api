@@ -113,7 +113,7 @@ export class CTProtoServer {
       });
 
       msgWaiter = setTimeout(() => {
-        socket.close(CloseEventCode.TryAgainLater, 'Authorization requiered');
+        socket.close(CloseEventCode.TryAgainLater, 'Authorization required');
       }, msgWaitingTime);
 
       /**

@@ -4,7 +4,7 @@ import { createMessage, createMessageId } from './utils';
 import { NewMessage } from '../types';
 
 /**
- * These tests are now working properly!
+ * These tests are not working properly!
  * All the expects inside the setTimeout always pass.
  * @todo Use end-to-end testing to test the responding logic
  *
