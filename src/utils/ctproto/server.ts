@@ -54,6 +54,7 @@ export interface CTProtoServerOptions {
  * @todo use Logger instead of console
  * @todo close broken connection ping-pong (https://github.com/websockets/ws#how-to-detect-and-close-broken-connections)
  * @todo implement the 'destroy()' method that will stop the server
+ * @todo move validation logic to the validator.ts
  */
 export class CTProtoServer {
   /**
