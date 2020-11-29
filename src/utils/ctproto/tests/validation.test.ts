@@ -55,7 +55,7 @@ describe('CTProtoServer', () => {
       new CTProtoServer(transportConfig, new ws.Server());
 
       expect(socketClose).toBeCalledTimes(0);
-      expect(socketSend).toHaveBeenCalledWith('Message Format Error: "messageId" field missed');
+      expect(socketSend).toHaveBeenCalledWith(expect.stringMatching(`Message Format Error: 'messageId' field missed`));
     });
 
     test('should send an error if message has no «type» property', () => {
@@ -68,7 +68,7 @@ describe('CTProtoServer', () => {
       new CTProtoServer(transportConfig, new ws.Server());
 
       expect(socketClose).toBeCalledTimes(0);
-      expect(socketSend).toHaveBeenCalledWith('Message Format Error: "type" field missed');
+      expect(socketSend).toHaveBeenCalledWith(expect.stringMatching(`Message Format Error: 'type' field missed`));
     });
 
     test('should send an error if message has no «payload» property', () => {
@@ -84,7 +84,7 @@ describe('CTProtoServer', () => {
       new CTProtoServer(transportConfig, new ws.Server());
 
       expect(socketClose).toBeCalledTimes(0);
-      expect(socketSend).toHaveBeenCalledWith('Message Format Error: "payload" field missed');
+      expect(socketSend).toHaveBeenCalledWith(expect.stringMatching(`Message Format Error: 'payload' field missed`));
     });
 
     test('should send an error if message «messageId» is not a string', () => {
@@ -101,7 +101,7 @@ describe('CTProtoServer', () => {
       new CTProtoServer(transportConfig, new ws.Server());
 
       expect(socketClose).toBeCalledTimes(0);
-      expect(socketSend).toHaveBeenCalledWith('Message Format Error: "messageId" should be a string');
+      expect(socketSend).toHaveBeenCalledWith(expect.stringMatching(`Message Format Error: 'messageId' should be a string`));
     });
 
     test('should send an error if message «type» is not a string', () => {
@@ -118,7 +118,7 @@ describe('CTProtoServer', () => {
       new CTProtoServer(transportConfig, new ws.Server());
 
       expect(socketClose).toBeCalledTimes(0);
-      expect(socketSend).toHaveBeenCalledWith('Message Format Error: "type" should be a string');
+      expect(socketSend).toHaveBeenCalledWith(expect.stringMatching(`Message Format Error: 'type' should be a string`));
     });
 
     test('should send an error if message «payload» is not an object', () => {
@@ -135,24 +135,24 @@ describe('CTProtoServer', () => {
       new CTProtoServer(transportConfig, new ws.Server());
 
       expect(socketClose).toBeCalledTimes(0);
-      expect(socketSend).toHaveBeenCalledWith('Message Format Error: "payload" should be an object');
+      expect(socketSend).toHaveBeenCalledWith(expect.stringMatching(`Message Format Error: 'payload' should be an object`));
     });
-  });
 
-  test('should send an error if «messageId» is invalid', () => {
-    /**
-     * Imitate the message with '«messageId»' that is not a string
-     */
-    const socketMessage = JSON.stringify({
-      messageId: 'authorize', // <-- invalid message id
-      payload: {},
-      type: 'some-type',
+    test('should send an error if «messageId» is invalid', () => {
+      /**
+       * Imitate the message with '«messageId»' that is not a string
+       */
+      const socketMessage = JSON.stringify({
+        messageId: 'authorize', // <-- invalid message id
+        payload: {},
+        type: 'some-type',
+      });
+      const ws = createWsMockWithMessage(socketMessage);
+
+      new CTProtoServer(transportConfig, new ws.Server());
+
+      expect(socketSend).toHaveBeenCalledWith(expect.stringMatching('Message Format Error: Invalid message id'));
+      expect(socketClose).toBeCalledTimes(0);
     });
-    const ws = createWsMockWithMessage(socketMessage);
-
-    new CTProtoServer(transportConfig, new ws.Server());
-
-    expect(socketSend).toHaveBeenCalledWith('Message Format Error: Invalid message id');
-    expect(socketClose).toBeCalledTimes(0);
   });
 });

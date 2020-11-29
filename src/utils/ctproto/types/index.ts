@@ -4,9 +4,9 @@ import {
   MessagePayload,
   NewMessage,
   ResponseMessage,
-  PossibleInvalidMessage,
+  PossibleInvalidMessage
 } from './message';
-import Client from '../client';
+import { AuthData, AuthRequestPayload } from './auth';
 
 export {
   MessagePayload,
@@ -14,5 +14,6 @@ export {
   NewMessage,
   ResponseMessage,
   PossibleInvalidMessage,
-  Client,
+  AuthData,
+  AuthRequestPayload
 };

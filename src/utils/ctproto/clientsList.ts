@@ -1,4 +1,6 @@
 import Client from './client';
+import { MessagePayload } from './types';
+import MessageFactory from './MessageFactory';
 
 /**
  * Method for finding a client by some external logic.
@@ -15,13 +17,13 @@ type ClientQueryCallback = (client: Client) => boolean;
  */
 export default class ClientsList {
   /**
-   * Stores connected cliens list
+   * Stores connected clients list
    */
   private clients: Client[] = [];
 
   /**
    * This property will store currently found items.
-   * Used for chaning via Fluent Interface:
+   * Used for chaining via Fluent Interface:
    *
    * @example  clients.find((client) => client.socket === socket ).remove();
    */
@@ -41,7 +43,7 @@ export default class ClientsList {
   /**
    * Return client by query callback
    *
-   * @param queryCallback - search functon
+   * @param queryCallback - search function
    */
   public query(queryCallback: ClientQueryCallback): ClientsList {
     this.cursor = this.clients.filter(queryCallback);
@@ -84,6 +86,24 @@ export default class ClientsList {
       if (index > -1) {
         this.clients.splice(index, 1);
       }
+    });
+
+    return this;
+  }
+
+  /**
+   * Sends a message to the found clients
+   *
+   * @param type - message action type
+   * @param payload - data to send
+   */
+  public send(type: string, payload: MessagePayload): ClientsList {
+    if (!this.cursor) {
+      return this;
+    }
+
+    this.cursor.forEach(client => {
+      client.socket.send(MessageFactory.create(type, payload));
     });
 
     return this;

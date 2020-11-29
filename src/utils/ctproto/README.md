@@ -62,9 +62,79 @@ Example of auth response message:
 }
 ```
 
+## Errors 
 
+All errors will be sent to the client with structure like that:
 
- 
+```json
+{
+  "type": "error",
+  "payload": {
+    "error":  "Example of the error message"
+  },
+  "messageId": "3eo11IpiZC"
+}
+```
 
 ## Server
 
+To use CTProto JavaScript server implementation, follow next guide.
+
+```ts
+import { CTProtoServer } from './ctproto/server';
+import { AuthRequestPayload, AuthData } from './ctproto/types';
+import { NewMessage } from './ctproto/types';
+
+const transport = new CTProtoServer({
+  port: 4000,
+  path: '/client',
+  async onAuth(authRequestPayload: AuthRequestPayload): Promise<AuthData> {
+    const user = aurhorizeUser(authRequestPayload)
+
+    if (!user) {
+      throw new Error('Wrong auth payload');
+    }
+
+    return {
+      user
+    };
+  },
+
+  async onMessage(message: NewMessage): Promise<void | object> {
+    // massage handling
+  },
+});
+```
+
+Where 
+
+| -- | -- | -- |
+| `port` | _number_ | The port where to bind the server. |
+| `path` | _string_ | Accept only connections matching this path. |
+| `onAuth` | _(authRequestPayload: AuthRequestPayload) => Promise<AuthData>_ | Method for authorization. See details below |
+| `onMessage` | _(message: NewMessage) => Promise<void | object>_ | Message handler. See details below |
+
+### onAuth()
+
+This callback will contain your application authorization logic. It will accept the payload of the `authorize` request. 
+
+You can implement your own authorization logic in there, such as DB queries etc.
+
+This method should return authorized client data, such as user id and so on. This data will be returned to client with the next response message.
+Also, this authData will be saved for this connected client under the hood of the protocol. 
+You can query it later, for example for sending messages to some connected clients:
+
+```ts
+const workspaceId = '123';
+
+transport
+    .clients
+    .query((client: Client) => (client.authData as DevopsToolboxAuthData).workspaceIds.includes(workspaceId))
+    .send('workspace-updated', { workspace });
+```
+
+### onMessage()
+
+This callback will be fired when the new message accepted from the client. It will get a whole message object as a param.
+
+You can handle a message and optionally you can return a value (`object`) to respond on this message. 

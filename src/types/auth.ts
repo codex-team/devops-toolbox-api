@@ -1,4 +1,4 @@
-import { AuthData, AuthRequestPayload } from '../utils/ctproto/types/auth';
+import { AuthData } from '../utils/ctproto/types/auth';
 
 /**
  * Data used for authorization
@@ -12,11 +12,11 @@ export type DevopsToolboxAuthRequest = {
 
 /**
  * This data will be saved (and returned to client)
- * after sucessfull authorization
+ * after successful authorization
  */
 export interface DevopsToolboxAuthData extends AuthData {
   /**
-   * Owned worksapces ids
+   * Owned workspaces ids
    */
   workspaceIds: string[];
 

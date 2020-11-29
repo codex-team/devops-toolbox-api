@@ -4,8 +4,9 @@ import { CTProtoServer } from './utils/ctproto/server';
 import { Workspace } from './types/workspace';
 import WorkspacesService from './services/workspace';
 import { DevopsToolboxAuthData, DevopsToolboxAuthRequest } from './types/auth';
-import { NewMessage } from './utils/ctproto/types';
-import { AuthRequestPayload } from './utils/ctproto/types/auth';
+import { NewMessage, AuthRequestPayload } from './utils/ctproto/types';
+import express from "express";
+import HttpError from "./utils/httpError";
 
 app.listen(Config.httpPort, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${Config.httpPort}`);
@@ -13,7 +14,7 @@ app.listen(Config.httpPort, () => {
 
 const transport = new CTProtoServer({
   port: Config.wsPort,
-  // path: '/config',
+  path: '/client',
   async onAuth(authRequestPayload: AuthRequestPayload): Promise<DevopsToolboxAuthData> {
     /**
      * Connected client's authorization token
@@ -42,3 +43,10 @@ const transport = new CTProtoServer({
     return Promise.resolve();
   },
 });
+
+/**
+ * Save transport to locals
+ * That allows using it in controllers
+ * @example req.app.locals.transport
+ */
+app.locals.transport = transport;

@@ -5,8 +5,9 @@ import { CriticalError, MessageFormatError, MessageParseError } from './errors';
 import { CloseEventCode } from './closeEvent';
 import Client from './client';
 import { AuthData, AuthRequestPayload } from './types/auth';
-import { NewMessage, PossibleInvalidMessage, ResponseMessage } from './types';
+import { NewMessage, PossibleInvalidMessage } from './types';
 import ClientsList from './clientsList';
+import MessageFactory from './MessageFactory';
 
 export interface CTProtoServerOptions {
   /**
@@ -51,8 +52,8 @@ export interface CTProtoServerOptions {
  *
  * @todo strict connections only from /client route
  * @todo use Logger instead of console
- * @todo send errors via NewMessage
  * @todo close broken connection ping-pong (https://github.com/websockets/ws#how-to-detect-and-close-broken-connections)
+ * @todo implement the 'destroy()' method that will stop the server
  */
 export class CTProtoServer {
   /**
@@ -135,15 +136,13 @@ export class CTProtoServer {
   private async onmessage(socket: ws, data: ws.Data): Promise<void> {
     try {
       this.validateMessage(data as string);
-
-      console.log('message is valid');
     } catch (error) {
       this.log(`Wrong message accepted: ${error.message} `, data);
 
       if (error instanceof CriticalError) {
         socket.close(CloseEventCode.UnsupportedData, error.message);
       } else {
-        socket.send('Message Format Error: ' + error.message);
+        socket.send(MessageFactory.createError('Message Format Error: ' + error.message));
       }
 
       return;
@@ -183,10 +182,7 @@ export class CTProtoServer {
       /**
        * Respond with success message and auth data
        */
-      socket.send(JSON.stringify({
-        messageId: message.type,
-        payload: authData,
-      } as ResponseMessage));
+      socket.send(MessageFactory.respond(message.messageId, authData));
     } catch (error) {
       socket.close(CloseEventCode.PolicyViolation, 'Authorization failed: ' + error.message);
     }
@@ -216,10 +212,7 @@ export class CTProtoServer {
       /**
        * Respond with payload got from the onMessage handler
        */
-      socket.send(JSON.stringify({
-        messageId: message.messageId,
-        payload: response,
-      } as ResponseMessage));
+      socket.send(MessageFactory.respond(message.messageId, response));
     } catch (error) {
       this.log('Internal error while processing a message: ', error.message);
     }
@@ -260,7 +253,7 @@ export class CTProtoServer {
 
     requiredMessageFields.forEach((field) => {
       if ((parsedMessage as unknown as PossibleInvalidMessage)[field] === undefined) {
-        throw new MessageFormatError(`"${field}" field missed`);
+        throw new MessageFormatError(`'${field}' field missed`);
       }
     });
 
@@ -278,14 +271,14 @@ export class CTProtoServer {
 
       // eslint-disable-next-line valid-typeof
       if (typeof value !== type) {
-        throw new MessageFormatError(`"${name}" should be ${type === 'object' ? 'an' : 'a'} ${type}`);
+        throw new MessageFormatError(`'${name}' should be ${type === 'object' ? 'an' : 'a'} ${type}`);
       }
     });
 
     /**
      * Check message id for validness
      */
-    if (!CTProtoServer.isMessageIdValid(parsedMessage.messageId)){
+    if (!CTProtoServer.isMessageIdValid(parsedMessage.messageId)) {
       throw new MessageFormatError('Invalid message id');
     }
   }
@@ -297,11 +290,11 @@ export class CTProtoServer {
    * @param messageId - id to check
    */
   private static isMessageIdValid(messageId: string): boolean {
-    if (messageId.length !== 10){
+    if (messageId.length !== 10) {
       return false;
     }
 
-    if (!messageId.match(/^[A-Za-z0-9_-]{10}$/)){
+    if (!messageId.match(/^[A-Za-z0-9_-]{10}$/)) {
       return false;
     }
 

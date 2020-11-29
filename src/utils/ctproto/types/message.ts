@@ -40,7 +40,7 @@ export interface NewMessage extends Message {
 /**
  * Message can contain any data at payload
  */
-export type MessagePayload = { [key: string]: unknown }
+export interface MessagePayload extends Object {}
 
 /**
  * Before the type-validation we should all messages as possible invalid with unknown field types

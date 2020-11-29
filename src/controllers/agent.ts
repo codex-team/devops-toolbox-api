@@ -1,6 +1,8 @@
 import express from 'express';
 import WorkspacesService from '../services/workspace';
 import { Workspace } from '../types';
+import Client from '../utils/ctproto/client';
+import { DevopsToolboxAuthData } from '../types/auth';
 /**
  * Agent controller
  */
@@ -15,14 +17,10 @@ export default class AgentController {
     const workspace: Workspace | null = await WorkspacesService.updateServices(req.headers.authorization, req.body.services);
 
     if (workspace) {
-      // const clients: Client[] | undefined = ClientsList.getAll().find(workspace._id.toString());
-
-      // clients?.forEach(client => Transport.send(client, 'workspace-update', { workspace }));
-
-      // req.locals.transport
-      //   .clients
-      //     .find((client) => client.auth.workspaceIds.includes(workspace._id) ) // should return Client class { auth : any, socket: ws , socketId: string }
-      //     .send('workspace updated', { workspace });
+      req.app.locals.transport
+        .clients
+        .query((client: Client) => (client.authData as DevopsToolboxAuthData).workspaceIds.includes(workspace._id))
+        .send('workspace-updated', { workspace });
     }
 
     res.json({

@@ -1,5 +1,5 @@
 import ws from 'ws';
-import { AuthData } from './types/auth';
+import { AuthData } from './types';
 
 /**
  * Represents the connected client
