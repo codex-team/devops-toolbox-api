@@ -31,7 +31,7 @@ Example of a correct message:
 "{\"messageId\":\"qUw0SWTeJX\",\"type\":\"update-workspace\",\"payload\":{\"name\":\"Example\"}}"
 ```
 
-## Authorisation
+## Authorization
 
 The first message after establishing the connection should be the `authorize`. 
 If the server won't accept this message after 3 seconds after connection, it will close the connection.
@@ -108,6 +108,7 @@ const transport = new CTProtoServer({
 
 Where 
 
+| option | type | description |
 | -- | -- | -- |
 | `port` | _number_ | The port where to bind the server. |
 | `path` | _string_ | Accept only connections matching this path. |
@@ -121,7 +122,7 @@ This callback will contain your application authorization logic. It will accept 
 You can implement your own authorization logic in there, such as DB queries etc.
 
 This method should return authorized client data, such as user id and so on. This data will be returned to client with the next response message.
-Also, this authData will be saved for this connected client under the hood of the protocol. 
+Also, this data will be saved as `authData` for this connected client under the hood of the protocol. 
 You can query it later, for example for sending messages to some connected clients:
 
 ```ts
@@ -129,7 +130,7 @@ const workspaceId = '123';
 
 transport
     .clients
-    .query((client: Client) => (client.authData as DevopsToolboxAuthData).workspaceIds.includes(workspaceId))
+    .query((client: Client) => client.authData.workspaceIds.includes(workspaceId))
     .send('workspace-updated', { workspace });
 ```
 
