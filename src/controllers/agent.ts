@@ -19,7 +19,7 @@ export default class AgentController {
     if (workspace) {
       req.app.locals.transport
         .clients
-        .query((client: Client) => (client.authData as DevopsToolboxAuthData).workspaceIds.includes(workspace._id))
+        .find((client: Client) => (client.authData as DevopsToolboxAuthData).workspaceIds.includes(workspace._id))
         .send('workspace-updated', { workspace });
     }
 

@@ -130,7 +130,7 @@ const workspaceId = '123';
 
 transport
     .clients
-    .query((client: Client) => client.authData.workspaceIds.includes(workspaceId))
+    .find((client: Client) => client.authData.workspaceIds.includes(workspaceId))
     .send('workspace-updated', { workspace });
 ```
 
