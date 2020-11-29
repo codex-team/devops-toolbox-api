@@ -150,7 +150,7 @@ export class CTProtoServer {
     }
 
     const message = JSON.parse(data as string);
-    const isFirstMessage = !this.clients.query((client: Client) => client.socket === socket).exists();
+    const isFirstMessage = !this.clients.find((client: Client) => client.socket === socket).exists();
 
     if (isFirstMessage) {
       this.handleFirstMessage(socket, message);
@@ -328,7 +328,7 @@ export class CTProtoServer {
    * @param socket - disconnected socket
    */
   private onclose(socket: ws): void {
-    this.clients.query((client: Client) => client.socket === socket).remove();
+    this.clients.find((client: Client) => client.socket === socket).remove();
   }
 
   /**
@@ -337,6 +337,6 @@ export class CTProtoServer {
    * @param socket - connected socket
    */
   private onerror(socket: ws): void {
-    this.clients.query((client: Client) => client.socket === socket).remove();
+    this.clients.find((client: Client) => client.socket === socket).remove();
   }
 }

@@ -41,11 +41,11 @@ export default class ClientsList {
   }
 
   /**
-   * Return client by query callback
+   * Return client by find callback
    *
    * @param queryCallback - search function
    */
-  public query(queryCallback: ClientQueryCallback): ClientsList {
+  public find(queryCallback: ClientQueryCallback): ClientsList {
     this.cursor = this.clients.filter(queryCallback);
 
     return this;

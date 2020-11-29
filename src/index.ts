@@ -36,6 +36,9 @@ const transport = new CTProtoServer({
   },
 
   async onMessage(message: NewMessage): Promise<void | object> {
+    /**
+     * @todo add handlers
+     */
     switch (message.type) {
 
     }

@@ -185,7 +185,7 @@ describe('CTProtoServer', () => {
        * We can't do it right way - using 'await' - because we don't have an access to the 'onmessage' method.
        */
       setTimeout(() => {
-        const savedClientExists = transport.clients.query(client => client.authData === authDataMock).exists();
+        const savedClientExists = transport.clients.find(client => client.authData === authDataMock).exists();
 
         expect(savedClientExists).toBeTruthy();
       }, 50);
