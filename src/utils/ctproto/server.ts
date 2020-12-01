@@ -49,7 +49,7 @@ export interface CTProtoServerOptions {
  * Class Transport (Transport level + Presentation level)
  *
  *
- * @todo strict connections only from /client route
+ * @todo strict connections only from /client route (@see https://stackoverflow.com/questions/22429744/how-to-setup-route-for-websocket-server-in-express)
  * @todo use Logger instead of console
  * @todo close broken connection ping-pong (https://github.com/websockets/ws#how-to-detect-and-close-broken-connections)
  * @todo implement the 'destroy()' method that will stop the server
@@ -89,7 +89,7 @@ export class CTProtoServer {
        */
       clientTracking: false,
     }, () => {
-      this.log(`Server is running at ws://localhost:${options.port}}`);
+      this.log(`Server is running at ws://localhost:${options.port}`);
     });
 
     /**
@@ -224,7 +224,7 @@ export class CTProtoServer {
    * @param context - additional data to log
    */
   private log(text: string, context?: unknown): void {
-    const prefix = 'CTProto ♥';
+    const prefix = 'CTProto 💖';
 
     if (this.options.disableLogs) {
       return;

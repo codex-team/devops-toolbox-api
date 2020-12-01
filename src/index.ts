@@ -12,7 +12,7 @@ app.listen(Config.httpPort, () => {
 
 const transport = new CTProtoServer({
   port: Config.wsPort,
-  path: '/client',
+  // path: '/client',
   async onAuth(authRequestPayload: AuthRequestPayload): Promise<DevopsToolboxAuthData> {
     /**
      * Connected client's authorization token
