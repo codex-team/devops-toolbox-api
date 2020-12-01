@@ -1,11 +1,12 @@
-import { CTProtoServer, CTProtoServerOptions } from '../server';
+import { CTProtoServer } from '../server';
 import { createWsMockWithMessage, socketClose, socketSend } from './ws.mock';
 import { createMessage } from './utils';
 import { CloseEventCode } from '../closeEvent';
 import { MessagePayload, NewMessage } from '../types';
+import { AuthDataType, AuthRequestPayloadType } from './types/auth-mock';
 
 /**
- * Mock of external onAuth method that will do app-related authorisation
+ * Mock of external onAuth method that will do app-related authorization
  */
 const onAuthMock = jest.fn();
 
@@ -20,7 +21,7 @@ const onMessageMock = jest.fn();
  *
  * @param message - message to imitate its accepting
  */
-function createCTProtoServerWithFirstMessage(message?: Pick<NewMessage, 'type' | 'payload'>): CTProtoServer {
+function createCTProtoServerWithFirstMessage(message?: Pick<NewMessage, 'type' | 'payload'>): CTProtoServer<AuthRequestPayloadType, AuthDataType> {
   const socketMessage = message ? createMessage(message) : undefined;
   const ws = createWsMockWithMessage(socketMessage);
 
@@ -28,7 +29,7 @@ function createCTProtoServerWithFirstMessage(message?: Pick<NewMessage, 'type' |
     onAuth: onAuthMock,
     onMessage: onMessageMock,
     disableLogs: true,
-  } as CTProtoServerOptions, new ws.Server());
+  }, new ws.Server());
 }
 
 describe('CTProtoServer', () => {
@@ -98,9 +99,9 @@ describe('CTProtoServer', () => {
       /**
        * Imitate onAuth throwing error
        */
-      const appRealtedAuthError = new Error('No user found');
-      const unsuccessfullOnAuth = jest.fn(() => {
-        throw appRealtedAuthError;
+      const appRelatedAuthError = new Error('No user found');
+      const unsuccessfulOnAuth = jest.fn(() => {
+        throw appRelatedAuthError;
       });
 
       const ws = createWsMockWithMessage(createMessage({
@@ -110,13 +111,13 @@ describe('CTProtoServer', () => {
 
       // eslint-disable-next-line no-new
       new CTProtoServer({
-        onAuth: unsuccessfullOnAuth,
+        onAuth: unsuccessfulOnAuth,
         onMessage: onMessageMock,
         disableLogs: true,
-      } as CTProtoServerOptions, new ws.Server());
+      }, new ws.Server());
 
-      expect(unsuccessfullOnAuth).toThrowError(appRealtedAuthError);
-      expect(socketClose).toHaveBeenCalledWith(CloseEventCode.PolicyViolation, 'Authorization failed: ' + appRealtedAuthError.message);
+      expect(unsuccessfulOnAuth).toThrowError(appRelatedAuthError);
+      expect(socketClose).toHaveBeenCalledWith(CloseEventCode.PolicyViolation, 'Authorization failed: ' + appRelatedAuthError.message);
     });
 
     test('should send authData in case of succeeded auth', () => {
@@ -126,7 +127,7 @@ describe('CTProtoServer', () => {
       const authDataMock = {
         user: '1234',
       };
-      const successfullOnAuth = jest.fn(() => {
+      const successfulOnAuth = jest.fn(() => {
         return Promise.resolve(authDataMock);
       });
 
@@ -137,12 +138,12 @@ describe('CTProtoServer', () => {
 
       // eslint-disable-next-line no-new
       new CTProtoServer({
-        onAuth: successfullOnAuth,
+        onAuth: successfulOnAuth,
         onMessage: onMessageMock,
         disableLogs: true,
-      } as CTProtoServerOptions, new ws.Server());
+      }, new ws.Server());
 
-      expect(successfullOnAuth).toBeCalledWith(authRequestMock);
+      expect(successfulOnAuth).toBeCalledWith(authRequestMock);
 
       /**
        * Waiting when onAuth() will be resolved...   (along with 'onmessage')
@@ -166,7 +167,7 @@ describe('CTProtoServer', () => {
       const authDataMock = {
         user: '1234',
       };
-      const successfullOnAuth = jest.fn(() => {
+      const successfulOnAuth = jest.fn(() => {
         return Promise.resolve(authDataMock);
       });
 
@@ -176,10 +177,10 @@ describe('CTProtoServer', () => {
       }));
 
       const transport = new CTProtoServer({
-        onAuth: successfullOnAuth,
+        onAuth: successfulOnAuth,
         onMessage: onMessageMock,
         disableLogs: true,
-      } as CTProtoServerOptions, new ws.Server());
+      }, new ws.Server());
 
       /**
        * Waiting when onAuth() will be resolved...   (along with 'onmessage')
@@ -197,7 +198,7 @@ describe('CTProtoServer', () => {
      * Check the second message accepting
      */
     describe('accepting the second message', () => {
-      test('should ingore the «authorize» message if client is already authorised', () => {
+      test('should ignore the «authorize» message if client is already authorized', () => {
         /**
          * Imitate accepting two messages
          */
@@ -222,7 +223,7 @@ describe('CTProtoServer', () => {
           onAuth: onAuthMock,
           onMessage: onMessageMock,
           disableLogs: true,
-        } as CTProtoServerOptions, new ws.Server());
+        }, new ws.Server());
 
         /**
          * Message series will be processed with some delay (see ws.mock.ts@socketOnMock)

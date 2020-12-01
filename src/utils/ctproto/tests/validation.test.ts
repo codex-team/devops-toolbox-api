@@ -1,6 +1,6 @@
 /* eslint-disable no-new */ // to allow calling new CTProtoServer() without assigning
 
-import { CTProtoServer, CTProtoServerOptions } from '../server';
+import { CTProtoServer } from '../server';
 import { createWsMockWithMessage, socketClose, socketSend } from './ws.mock';
 
 describe('CTProtoServer', () => {
@@ -11,7 +11,7 @@ describe('CTProtoServer', () => {
   /**
    * In all tests at this section, options are not used, so we mock it with empty values
    */
-  const transportConfig: CTProtoServerOptions = {
+  const transportConfig = {
     onAuth: jest.fn(),
     onMessage: jest.fn(),
     disableLogs: true,

@@ -7,7 +7,7 @@ import { CloseEventCode } from './closeEvent';
  * Method for finding a client by some external logic.
  * Will be passed to the Array.find() method
  */
-type ClientQueryCallback = (client: Client) => boolean;
+type ClientQueryCallback<AuthData> = (client: Client<AuthData>, index: number, array: Client<AuthData>[]) => boolean;
 
 /**
  * Connected clients manager.
@@ -15,12 +15,14 @@ type ClientQueryCallback = (client: Client) => boolean;
  *
  * Pattern: Fluent Interface
  * https://en.wikipedia.org/wiki/Fluent_interface
+ *
+ * @template AuthData - structure described authorized client data
  */
-export default class ClientsList {
+export default class ClientsList<AuthData> {
   /**
    * Stores connected clients list
    */
-  private clients: Client[] = [];
+  private clients: Client<AuthData>[] = [];
 
   /**
    * This property will store currently found items.
@@ -28,14 +30,14 @@ export default class ClientsList {
    *
    * @example  clients.find((client) => client.socket === socket ).remove();
    */
-  private cursor: Client[] | undefined;
+  private cursor: Client<AuthData>[] | undefined;
 
   /**
    * Saves the new client
    *
    * @param client - client to save
    */
-  public add(client: Client): ClientsList {
+  public add(client: Client<AuthData>): ClientsList<AuthData> {
     this.clients.push(client);
 
     return this;
@@ -46,7 +48,7 @@ export default class ClientsList {
    *
    * @param queryCallback - search function
    */
-  public find(queryCallback: ClientQueryCallback): ClientsList {
+  public find(queryCallback: ClientQueryCallback<AuthData>): ClientsList<AuthData> {
     this.cursor = this.clients.filter(queryCallback);
 
     return this;
@@ -62,21 +64,21 @@ export default class ClientsList {
   /**
    * Returns found items
    */
-  public execute(): Client[] | undefined {
+  public execute(): Client<AuthData>[] | undefined {
     return this.cursor;
   }
 
   /**
    * Returns array of found items, or empty array
    */
-  public toArray(): Client[] {
+  public toArray(): Client<AuthData>[] {
     return this.cursor || [];
   }
 
   /**
    * Returns array of found items, or empty array
    */
-  public remove(): ClientsList {
+  public remove(): ClientsList<AuthData> {
     if (!this.cursor) {
       return this;
     }
@@ -103,7 +105,7 @@ export default class ClientsList {
    * @param type - message action type
    * @param payload - data to send
    */
-  public send(type: string, payload: MessagePayload): ClientsList {
+  public send(type: string, payload: MessagePayload): ClientsList<AuthData> {
     if (!this.cursor) {
       return this;
     }
@@ -120,7 +122,7 @@ export default class ClientsList {
    *
    * @param code - close event code
    */
-  public close(code = CloseEventCode.NormalClosure): ClientsList {
+  public close(code = CloseEventCode.NormalClosure): ClientsList<AuthData> {
     if (!this.cursor) {
       return this;
     }

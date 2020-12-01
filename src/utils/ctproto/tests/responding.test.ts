@@ -1,4 +1,4 @@
-import { CTProtoServer, CTProtoServerOptions } from '../server';
+import { CTProtoServer } from '../server';
 import { createWsMockWithMessage, socketSend } from './ws.mock';
 import { createMessage, createMessageId } from './utils';
 import { MessagePayload, NewMessage } from '../types';
@@ -11,7 +11,7 @@ import { MessagePayload, NewMessage } from '../types';
  */
 
 /**
- * Mock of external onAuth method that will do app-related authorisation
+ * Mock of external onAuth method that will do app-related authorization
  */
 const onAuthMock = jest.fn();
 
@@ -59,7 +59,7 @@ describe('CTProtoServer', () => {
         onAuth: onAuthMock,
         onMessage: onMessageMock,
         disableLogs: true,
-      } as CTProtoServerOptions, new ws.Server());
+      }, new ws.Server());
 
       /**
        * Message series will be processed with some delay (see ws.mock.ts@socketOnMock)
@@ -103,7 +103,7 @@ describe('CTProtoServer', () => {
         onAuth: onAuthMock,
         onMessage: onMessageWithReturnValue,
         disableLogs: true,
-      } as CTProtoServerOptions, new ws.Server());
+      }, new ws.Server());
 
       /**
        * Message series will be processed with some delay (see ws.mock.ts@socketOnMock)
@@ -144,7 +144,7 @@ describe('CTProtoServer', () => {
         onAuth: onAuthMock,
         onMessage: onMessageWithReturnValue,
         disableLogs: true,
-      } as CTProtoServerOptions, new ws.Server());
+      }, new ws.Server());
 
       /**
        * Message series will be processed with some delay (see ws.mock.ts@socketOnMock)

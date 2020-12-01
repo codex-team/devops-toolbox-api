@@ -3,12 +3,12 @@ import ws from 'ws';
 import { CriticalError } from './errors';
 import { CloseEventCode } from './closeEvent';
 import Client from './client';
-import { NewMessage, AuthData, AuthRequestPayload } from './types';
+import { NewMessage } from './types';
 import ClientsList from './clientsList';
 import MessageFactory from './messageFactory';
 import MessageValidator from './messageValidator';
 
-export interface CTProtoServerOptions {
+export interface CTProtoServerOptions<AuthRequestPayload, AuthData> {
   /**
    * WebSocket server port
    */
@@ -49,12 +49,12 @@ export interface CTProtoServerOptions {
  * @todo close broken connection ping-pong (https://github.com/websockets/ws#how-to-detect-and-close-broken-connections)
  * @todo implement the 'destroy()' method that will stop the server
  */
-export class CTProtoServer {
+export class CTProtoServer<AuthRequestPayload, AuthData> {
   /**
    * Manager of currently connected clients
    * Allows to find, send and other manipulations.
    */
-  public clients: ClientsList = new ClientsList();
+  public clients = new ClientsList<AuthData>();
 
   /**
    * Instance of transport-layer framework
@@ -65,7 +65,7 @@ export class CTProtoServer {
   /**
    * Configuration options passed on Transport initialization
    */
-  private options: CTProtoServerOptions;
+  private options: CTProtoServerOptions<AuthRequestPayload, AuthData>;
 
   /**
    * Constructor
@@ -73,7 +73,7 @@ export class CTProtoServer {
    * @param options - Transport options
    * @param WebSocketsServer - allows to override the 'ws' dependency. Used for mocking it in tests.
    */
-  constructor(options: CTProtoServerOptions, WebSocketsServer?: ws.Server) {
+  constructor(options: CTProtoServerOptions<AuthRequestPayload, AuthData>, WebSocketsServer?: ws.Server) {
     this.options = options;
     this.wsServer = WebSocketsServer || new ws.Server({
       port: options.port,
@@ -142,7 +142,7 @@ export class CTProtoServer {
     }
 
     const message = JSON.parse(data as string);
-    const isFirstMessage = !this.clients.find((client: Client) => client.socket === socket).exists();
+    const isFirstMessage = !this.clients.find((client) => client.socket === socket).exists();
 
     try {
       if (isFirstMessage) {
@@ -163,7 +163,7 @@ export class CTProtoServer {
    * @param socket - connected socket
    * @param message - accepted message
    */
-  private async handleFirstMessage(socket: ws, message: NewMessage): Promise<void> {
+  private async handleFirstMessage(socket: ws, message: NewMessage<AuthRequestPayload>): Promise<void> {
     if (message.type !== 'authorize') {
       socket.close(CloseEventCode.PolicyViolation, 'Unauthorized');
 
@@ -241,7 +241,7 @@ export class CTProtoServer {
    * @param socket - disconnected socket
    */
   private onclose(socket: ws): void {
-    this.clients.find((client: Client) => client.socket === socket).remove();
+    this.clients.find((client) => client.socket === socket).remove();
   }
 
   /**
@@ -250,6 +250,6 @@ export class CTProtoServer {
    * @param socket - connected socket
    */
   private onerror(socket: ws): void {
-    this.clients.find((client: Client) => client.socket === socket).remove();
+    this.clients.find((client) => client.socket === socket).remove();
   }
 }

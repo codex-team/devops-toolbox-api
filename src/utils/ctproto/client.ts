@@ -1,10 +1,11 @@
 import ws from 'ws';
-import { AuthData } from './types';
 
 /**
  * Represents the connected client
+ *
+ * @template AuthData - structure described authorized client data
  */
-export default class Client {
+export default class Client<AuthData> {
   /**
    * Store 'ws' socket of a client.
    * Allows us to send him messages or break the connection
@@ -14,7 +15,7 @@ export default class Client {
   /**
    * Stores app-related auth data returned by 'onAuth' callback
    */
-  public authData: AuthData = {};
+  public authData: AuthData;
 
   /**
    * Create a new client

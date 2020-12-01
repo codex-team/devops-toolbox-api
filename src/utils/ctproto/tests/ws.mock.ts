@@ -23,7 +23,7 @@ export const socketClose = jest.fn(() => {
  * @param message - any payload data as it can be got from socket.
  *                  If undefined, there will be no message imitated
  *
- * @param messageSeries - allows to pass message series (list of messges to call it one-by-one)
+ * @param messageSeries - allows to pass message series (list of messages to call it one-by-one)
  */
 export function createWsMockWithMessage(message: unknown, messageSeries?: unknown[]): typeof ws {
   /**

@@ -4,19 +4,31 @@ import { CTProtoServer } from './utils/ctproto/server';
 import { Workspace } from './types';
 import WorkspacesService from './services/workspace';
 import { DevopsToolboxAuthData, DevopsToolboxAuthRequest } from './types/auth';
-import { NewMessage, AuthRequestPayload } from './utils/ctproto/types';
+import { NewMessage } from './utils/ctproto/types';
 
 app.listen(Config.httpPort, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${Config.httpPort}`);
 });
 
+
+interface GetWorkspacesPayload {
+  workspace: string;
+}
+
+interface SaveUserPayload {
+  user: string;
+}
+
+type APIPayloads = SaveUserPayload | GetWorkspacesPayload;
+
+
 const transport = new CTProtoServer({
   port: Config.wsPort,
-  async onAuth(authRequestPayload: AuthRequestPayload): Promise<DevopsToolboxAuthData> {
+  async onAuth(authRequestPayload: DevopsToolboxAuthRequest): Promise<DevopsToolboxAuthData> {
     /**
      * Connected client's authorization token
      */
-    const authToken: string = (authRequestPayload as DevopsToolboxAuthRequest).token.toString();
+    const authToken = authRequestPayload.token.toString();
 
     /**
      * Connected client's workspaces list
@@ -32,13 +44,17 @@ const transport = new CTProtoServer({
     };
   },
 
-  async onMessage(message: NewMessage): Promise<void | Record<string, unknown>> {
+  async onMessage(message: NewMessage<APIPayloads>): Promise<void | Record<string, unknown>> {
     /**
      * @todo add handlers
      */
     switch (message.type) {
 
     }
+
+    message.payload
+
+
 
     return Promise.resolve();
   },
