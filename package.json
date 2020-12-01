@@ -1,7 +1,7 @@
 {
   "name": "devops-toolbox-api",
   "version": "0.0.1",
-  "description": "",
+  "description": "API service of CodeX DevOps Toolbox",
   "main": "index.js",
   "scripts": {
     "test": "jest",
