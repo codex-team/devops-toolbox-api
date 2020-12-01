@@ -1,7 +1,7 @@
 import { CTProtoServer, CTProtoServerOptions } from '../server';
 import { createWsMockWithMessage, socketSend } from './ws.mock';
 import { createMessage, createMessageId } from './utils';
-import {MessagePayload, NewMessage} from '../types';
+import { MessagePayload, NewMessage } from '../types';
 
 /**
  * These tests are not working properly!

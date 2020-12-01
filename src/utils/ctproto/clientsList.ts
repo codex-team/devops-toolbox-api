@@ -1,7 +1,7 @@
 import Client from './client';
 import { MessagePayload } from './types';
 import MessageFactory from './messageFactory';
-import {CloseEventCode} from "./closeEvent";
+import { CloseEventCode } from './closeEvent';
 
 /**
  * Method for finding a client by some external logic.
