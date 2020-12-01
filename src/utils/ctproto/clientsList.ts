@@ -1,6 +1,7 @@
 import Client from './client';
 import { MessagePayload } from './types';
 import MessageFactory from './messageFactory';
+import {CloseEventCode} from "./closeEvent";
 
 /**
  * Method for finding a client by some external logic.
@@ -80,6 +81,11 @@ export default class ClientsList {
       return this;
     }
 
+    /**
+     * Close connections before removing
+     */
+    this.close();
+
     this.cursor.forEach(client => {
       const index = this.clients.indexOf(client);
 
@@ -104,6 +110,23 @@ export default class ClientsList {
 
     this.cursor.forEach(client => {
       client.socket.send(MessageFactory.create(type, payload));
+    });
+
+    return this;
+  }
+
+  /**
+   * Closes connection of selected clients
+   *
+   * @param code - close event code
+   */
+  public close(code = CloseEventCode.NormalClosure): ClientsList {
+    if (!this.cursor) {
+      return this;
+    }
+
+    this.cursor.forEach(client => {
+      client.socket.close(code);
     });
 
     return this;

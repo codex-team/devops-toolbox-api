@@ -4,7 +4,7 @@
 
 To run application in Docker:
 
-1. Fill `.env` file with necessary values (see .env.sample)
+1. Fill `.env` file with necessary values (see .env.example)
 2. Run the `docker-compose`:
     Development mode with hot-reloading:
     ```bash
