@@ -23,6 +23,7 @@
   "homepage": "https://github.com/codex-team/devops-toolbox-api#readme",
   "dependencies": {
     "@types/express": "^4.17.8",
+    "@types/jest": "^26.0.15",
     "@types/mongoose": "^5.7.36",
     "@types/node": "^14.14.2",
     "@types/ws": "^7.2.7",
@@ -35,7 +36,6 @@
     "yaml": "^1.10.0"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.15",
     "eslint": "^7.14.0",
     "eslint-config-codex": "github:codex-team/eslint-config",
     "eslint-plugin-jest": "^24.1.3",
