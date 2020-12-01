@@ -3,12 +3,12 @@ import { AuthData } from '../utils/ctproto/types/auth';
 /**
  * Data used for authorization
  */
-export type DevopsToolboxAuthRequest = {
+export interface DevopsToolboxAuthRequest {
   /**
    * Client Auth Token
    */
   token: string;
-};
+}
 
 /**
  * This data will be saved (and returned to client)

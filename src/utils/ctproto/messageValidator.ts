@@ -1,5 +1,4 @@
 import { MessageFormatError, MessageParseError } from './errors';
-import { NewMessage, PossibleInvalidMessage } from './types';
 
 /**
  * Provides methods for validating message
@@ -23,10 +22,10 @@ export default class MessageValidator {
     /**
      * Check for JSON validness
      */
-    let parsedMessage: NewMessage;
+    let parsedMessage: Record<string, unknown>;
 
     try {
-      parsedMessage = JSON.parse(message) as NewMessage;
+      parsedMessage = JSON.parse(message);
     } catch (parsingError) {
       throw new MessageParseError(parsingError.message);
     }
@@ -37,7 +36,7 @@ export default class MessageValidator {
     const requiredMessageFields = ['messageId', 'type', 'payload'];
 
     requiredMessageFields.forEach((field) => {
-      if ((parsedMessage as unknown as PossibleInvalidMessage)[field] === undefined) {
+      if (parsedMessage[field] === undefined) {
         throw new MessageFormatError(`'${field}' field missed`);
       }
     });
@@ -52,7 +51,7 @@ export default class MessageValidator {
     };
 
     Object.entries(fieldTypes).forEach(([name, type]) => {
-      const value = (parsedMessage as unknown as PossibleInvalidMessage)[name];
+      const value = parsedMessage[name];
 
       // eslint-disable-next-line valid-typeof
       if (typeof value !== type) {
@@ -63,7 +62,7 @@ export default class MessageValidator {
     /**
      * Check message id for validness
      */
-    if (!MessageValidator.isMessageIdValid(parsedMessage.messageId)) {
+    if (!MessageValidator.isMessageIdValid(parsedMessage.messageId as string)) {
       throw new MessageFormatError('Invalid message id');
     }
   }

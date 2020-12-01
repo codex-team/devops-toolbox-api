@@ -41,8 +41,3 @@ export interface NewMessage extends Message {
    */
   type: string;
 }
-
-/**
- * Before the type-validation we should all messages as possible invalid with unknown field types
- */
-export type PossibleInvalidMessage = Record<string, unknown>;

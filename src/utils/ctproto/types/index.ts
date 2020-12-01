@@ -3,8 +3,7 @@ import {
   Message,
   MessagePayload,
   NewMessage,
-  ResponseMessage,
-  PossibleInvalidMessage
+  ResponseMessage
 } from './message';
 import { AuthData, AuthRequestPayload } from './auth';
 
@@ -13,7 +12,6 @@ export {
   Message,
   NewMessage,
   ResponseMessage,
-  PossibleInvalidMessage,
   AuthData,
   AuthRequestPayload
 };

@@ -15,11 +15,6 @@ export interface CTProtoServerOptions {
   port?: number;
 
   /**
-   * Allows to accept connection only from this route
-   */
-  path?: string;
-
-  /**
    * Method for socket authorization
    * Will be called when client will send the 'authorize' request.
    *
@@ -38,7 +33,7 @@ export interface CTProtoServerOptions {
   onMessage: (message: NewMessage) => Promise<void | Record<string, unknown>>;
 
   /**
-   * Allows to disable validation/authorisation and other warning messages
+   * Allows to disable validation/authorization and other warning messages
    */
   disableLogs?: boolean;
 }
@@ -82,7 +77,6 @@ export class CTProtoServer {
     this.options = options;
     this.wsServer = WebSocketsServer || new ws.Server({
       port: options.port,
-      path: options.path,
       /**
        * Do not save clients in ws.clients property
        * because we will use own Map (this.ClientsList)
@@ -150,10 +144,14 @@ export class CTProtoServer {
     const message = JSON.parse(data as string);
     const isFirstMessage = !this.clients.find((client: Client) => client.socket === socket).exists();
 
-    if (isFirstMessage) {
-      this.handleFirstMessage(socket, message);
-    } else {
-      this.handleAuthorizedMessage(socket, message);
+    try {
+      if (isFirstMessage) {
+        this.handleFirstMessage(socket, message);
+      } else {
+        this.handleAuthorizedMessage(socket, message);
+      }
+    } catch (error) {
+      this.log(`Error while processing a message: ${error.message}`, message);
     }
   }
 

@@ -6,5 +6,5 @@
     "outDir": "./build",
     "esModuleInterop": true,
     "strict": true
-  },
+  }
 }
