@@ -19,4 +19,4 @@ export default interface Server {
    * List of services running on the server
    */
   services: Service[];
-};
+}

@@ -1,12 +1,10 @@
 import app from './app';
 import Config from './config';
 import { CTProtoServer } from './utils/ctproto/server';
-import { Workspace } from './types/workspace';
+import { Workspace } from './types';
 import WorkspacesService from './services/workspace';
 import { DevopsToolboxAuthData, DevopsToolboxAuthRequest } from './types/auth';
 import { NewMessage, AuthRequestPayload } from './utils/ctproto/types';
-import express from "express";
-import HttpError from "./utils/httpError";
 
 app.listen(Config.httpPort, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${Config.httpPort}`);
@@ -35,7 +33,7 @@ const transport = new CTProtoServer({
     };
   },
 
-  async onMessage(message: NewMessage): Promise<void | object> {
+  async onMessage(message: NewMessage): Promise<void | Record<string, unknown>> {
     /**
      * @todo add handlers
      */
@@ -50,6 +48,7 @@ const transport = new CTProtoServer({
 /**
  * Save transport to locals
  * That allows using it in controllers
+ *
  * @example req.app.locals.transport
  */
 app.locals.transport = transport;

@@ -1,13 +1,12 @@
 import ws from 'ws';
 
-import http from 'http';
-import { CriticalError, MessageFormatError, MessageParseError } from './errors';
+import { CriticalError } from './errors';
 import { CloseEventCode } from './closeEvent';
 import Client from './client';
-import { AuthData, AuthRequestPayload } from './types/auth';
-import { NewMessage, PossibleInvalidMessage } from './types';
+import { NewMessage, AuthData, AuthRequestPayload } from './types';
 import ClientsList from './clientsList';
-import MessageFactory from './MessageFactory';
+import MessageFactory from './messageFactory';
+import MessageValidator from './messageValidator';
 
 export interface CTProtoServerOptions {
   /**
@@ -36,7 +35,7 @@ export interface CTProtoServerOptions {
    * @param message - full message data
    * @returns optionally can return any data to respond to client
    */
-  onMessage: (message: NewMessage) => Promise<void | object>;
+  onMessage: (message: NewMessage) => Promise<void | Record<string, unknown>>;
 
   /**
    * Allows to disable validation/authorisation and other warning messages
@@ -54,7 +53,6 @@ export interface CTProtoServerOptions {
  * @todo use Logger instead of console
  * @todo close broken connection ping-pong (https://github.com/websockets/ws#how-to-detect-and-close-broken-connections)
  * @todo implement the 'destroy()' method that will stop the server
- * @todo move validation logic to the validator.ts
  */
 export class CTProtoServer {
   /**
@@ -97,7 +95,7 @@ export class CTProtoServer {
     /**
      *  Client connects
      */
-    this.wsServer.on('connection', (socket: ws, _request: http.IncomingMessage) => {
+    this.wsServer.on('connection', (socket: ws) => {
       /**
        * We will close the socket if there is no messages for 3 seconds
        */
@@ -136,7 +134,7 @@ export class CTProtoServer {
    */
   private async onmessage(socket: ws, data: ws.Data): Promise<void> {
     try {
-      this.validateMessage(data as string);
+      MessageValidator.validateMessage(data as string);
     } catch (error) {
       this.log(`Wrong message accepted: ${error.message} `, data);
 
@@ -217,89 +215,6 @@ export class CTProtoServer {
     } catch (error) {
       this.log('Internal error while processing a message: ', error.message);
     }
-  }
-
-  /**
-   * Check if passed message fits the protocol format.
-   * Will throw an error if case of problems.
-   * If everything is ok, return void
-   *
-   * @param message - string got from client by socket
-   */
-  private validateMessage(message: unknown): void {
-    /**
-     * Check for message type
-     */
-    if (typeof message !== 'string') {
-      throw new MessageParseError('Unsupported data');
-    }
-
-    /**
-     * Check for JSON validness
-     */
-    let parsedMessage: NewMessage;
-
-    try {
-      parsedMessage = JSON.parse(message) as NewMessage;
-    } catch (parsingError) {
-      this.log('Message parsing error: ' + parsingError.message);
-
-      throw new MessageParseError(parsingError.message);
-    }
-
-    /**
-     * Check for required fields
-     */
-    const requiredMessageFields = ['messageId', 'type', 'payload'];
-
-    requiredMessageFields.forEach((field) => {
-      if ((parsedMessage as unknown as PossibleInvalidMessage)[field] === undefined) {
-        throw new MessageFormatError(`'${field}' field missed`);
-      }
-    });
-
-    /**
-     * Check fields type
-     */
-    const fieldTypes = {
-      messageId: 'string',
-      type: 'string',
-      payload: 'object',
-    };
-
-    Object.entries(fieldTypes).forEach(([name, type]) => {
-      const value = (parsedMessage as unknown as PossibleInvalidMessage)[name];
-
-      // eslint-disable-next-line valid-typeof
-      if (typeof value !== type) {
-        throw new MessageFormatError(`'${name}' should be ${type === 'object' ? 'an' : 'a'} ${type}`);
-      }
-    });
-
-    /**
-     * Check message id for validness
-     */
-    if (!CTProtoServer.isMessageIdValid(parsedMessage.messageId)) {
-      throw new MessageFormatError('Invalid message id');
-    }
-  }
-
-  /**
-   * Check message id for validness.
-   * It should be a 10 length URL-friendly string
-   *
-   * @param messageId - id to check
-   */
-  private static isMessageIdValid(messageId: string): boolean {
-    if (messageId.length !== 10) {
-      return false;
-    }
-
-    if (!messageId.match(/^[A-Za-z0-9_-]{10}$/)) {
-      return false;
-    }
-
-    return true;
   }
 
   /**

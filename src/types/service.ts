@@ -13,5 +13,5 @@ export default interface Service {
    * Useful data about the service
    * collected by Agent
    */
-  payload: object | object[];
-};
+  payload: Record<string, unknown>;
+}

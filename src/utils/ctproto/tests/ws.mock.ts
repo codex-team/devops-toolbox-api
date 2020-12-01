@@ -35,7 +35,7 @@ export function createWsMockWithMessage(message: unknown, messageSeries?: unknow
    *
    * In tests it will trigger the 'onmessage' handler.
    */
-  const socketOnMock = jest.fn((event: string, callback: Function) => {
+  const socketOnMock = jest.fn((event: string, callback: (param: unknown) => unknown) => {
     if (event !== 'message') {
       return;
     }

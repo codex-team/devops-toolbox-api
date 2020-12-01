@@ -8,7 +8,7 @@ export type DevopsToolboxAuthRequest = {
    * Client Auth Token
    */
   token: string;
-}
+};
 
 /**
  * This data will be saved (and returned to client)

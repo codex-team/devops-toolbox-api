@@ -2,6 +2,7 @@ import { CTProtoServer, CTProtoServerOptions } from '../server';
 import { createWsMockWithMessage, socketClose, socketSend } from './ws.mock';
 import { createMessage } from './utils';
 import { CloseEventCode } from '../closeEvent';
+import { MessagePayload, NewMessage } from '../types';
 
 /**
  * Mock of external onAuth method that will do app-related authorisation
@@ -19,7 +20,7 @@ const onMessageMock = jest.fn();
  *
  * @param message - message to imitate its accepting
  */
-function createCTProtoServerWithFirstMessage(message?: {type: string; payload: object}): CTProtoServer {
+function createCTProtoServerWithFirstMessage(message?: Pick<NewMessage, 'type' | 'payload'>): CTProtoServer {
   const socketMessage = message ? createMessage(message) : undefined;
   const ws = createWsMockWithMessage(socketMessage);
 
@@ -125,7 +126,7 @@ describe('CTProtoServer', () => {
       const authDataMock = {
         user: '1234',
       };
-      const successfullOnAuth = jest.fn((_authRequestPaylaod) => {
+      const successfullOnAuth = jest.fn(() => {
         return Promise.resolve(authDataMock);
       });
 
@@ -152,6 +153,7 @@ describe('CTProtoServer', () => {
         /**
          * We don't have an access to generated messageId, so we'll check only 'type' and 'payload'
          */
+        // eslint-disable-next-line prefer-regex-literals
         expect(socketSend).toHaveBeenCalledWith(expect.stringMatching(new RegExp(`"type":"auth-success"`)));
         expect(socketSend).toHaveBeenCalledWith(expect.stringMatching(new RegExp(`"payload": ${JSON.stringify(authDataMock)}`)));
       }, 50);
@@ -164,7 +166,7 @@ describe('CTProtoServer', () => {
       const authDataMock = {
         user: '1234',
       };
-      const successfullOnAuth = jest.fn((_authRequestPaylaod) => {
+      const successfullOnAuth = jest.fn(() => {
         return Promise.resolve(authDataMock);
       });
 
@@ -197,20 +199,20 @@ describe('CTProtoServer', () => {
     describe('accepting the second message', () => {
       test('should ingore the «authorize» message if client is already authorised', () => {
         /**
-         * Imitate accpeting two messages
+         * Imitate accepting two messages
          */
         const messageSeries = [
           createMessage({
             type: 'authorize',
             payload: {
               token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
-            },
+            } as MessagePayload,
           }),
           createMessage({
             type: 'authorize',
             payload: {
               token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
-            },
+            } as MessagePayload,
           }),
         ];
         const ws = createWsMockWithMessage(undefined, messageSeries);

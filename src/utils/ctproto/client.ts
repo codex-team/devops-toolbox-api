@@ -14,7 +14,7 @@ export default class Client {
   /**
    * Stores app-related auth data returned by 'onAuth' callback
    */
-  public authData: object = {};
+  public authData: AuthData = {};
 
   /**
    * Create a new client

@@ -1,4 +1,9 @@
 /**
+ * Message can contain any data at payload
+ */
+export interface MessagePayload extends Object {}
+
+/**
  * Any client-server message should fit this structure
  */
 export interface Message {
@@ -36,11 +41,6 @@ export interface NewMessage extends Message {
    */
   type: string;
 }
-
-/**
- * Message can contain any data at payload
- */
-export interface MessagePayload extends Object {}
 
 /**
  * Before the type-validation we should all messages as possible invalid with unknown field types

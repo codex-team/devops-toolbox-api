@@ -1,6 +1,6 @@
 import Client from './client';
 import { MessagePayload } from './types';
-import MessageFactory from './MessageFactory';
+import MessageFactory from './messageFactory';
 
 /**
  * Method for finding a client by some external logic.

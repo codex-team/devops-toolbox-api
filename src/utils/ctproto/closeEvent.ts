@@ -2,6 +2,7 @@
  * Websocket protocol close event reasons.
  * See https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent
  */
+// eslint-disable-next-line no-shadow
 export enum CloseEventCode {
   /**
    * Normal closure; the connection successfully completed whatever purpose for which it was created.

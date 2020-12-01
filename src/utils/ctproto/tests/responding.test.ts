@@ -1,13 +1,13 @@
 import { CTProtoServer, CTProtoServerOptions } from '../server';
 import { createWsMockWithMessage, socketSend } from './ws.mock';
 import { createMessage, createMessageId } from './utils';
-import { NewMessage } from '../types';
+import {MessagePayload, NewMessage} from '../types';
 
 /**
  * These tests are not working properly!
  * All the expects inside the setTimeout always pass.
- * @todo Use end-to-end testing to test the responding logic
  *
+ *  @todo Use end-to-end testing to test the responding logic
  */
 
 /**
@@ -45,7 +45,7 @@ describe('CTProtoServer', () => {
           type: 'authorize',
           payload: {
             token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
-          },
+          } as MessagePayload,
         }),
         createMessage({
           type: 'some-other-type',
@@ -88,7 +88,7 @@ describe('CTProtoServer', () => {
           type: 'authorize',
           payload: {
             token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
-          },
+          } as MessagePayload,
         }),
         JSON.stringify({
           messageId: secondMessageId,
@@ -130,7 +130,7 @@ describe('CTProtoServer', () => {
           type: 'authorize',
           payload: {
             token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
-          },
+          } as MessagePayload,
         }),
         createMessage({
           type: 'some-message-type',
