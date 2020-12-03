@@ -1,7 +1,6 @@
 import express from 'express';
 import WorkspacesService from '../services/workspace';
-import { Workspace } from '../types';
-import { ApiResponse, ApiOutgoingMessage } from '../types/api';
+import { Workspace, ApiResponse, ApiOutgoingMessage } from '../types';
 import { DevopsToolboxAuthData } from '../types/api/responses/authorize';
 import Client from '../utils/ctproto/client';
 

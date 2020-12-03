@@ -4,7 +4,7 @@ import Server from './server';
 /**
  * Interface for workspace
  */
-export interface Workspace extends mongoose.Document {
+export default interface Workspace extends mongoose.Document {
   /**
    * Workspace name
    */

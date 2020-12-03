@@ -53,7 +53,6 @@ export default class MessageValidator {
     Object.entries(fieldTypes).forEach(([name, type]) => {
       const value = parsedMessage[name];
 
-      // eslint-disable-next-line valid-typeof
       if (typeof value !== type) {
         throw new MessageFormatError(`'${name}' should be ${type === 'object' ? 'an' : 'a'} ${type}`);
       }

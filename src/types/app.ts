@@ -2,7 +2,7 @@ import express from 'express';
 import { CTProtoServer } from '../utils/ctproto/server';
 import { ApiRequest, ApiResponse, ApiOutgoingMessage } from './api';
 import { AuthorizeMessagePayload } from './api/requests/authorize';
-import { DevopsToolboxAuthData } from './auth';
+import { DevopsToolboxAuthData } from './api/responses/authorize';
 
 /**
  * Describes app.locals structure
@@ -16,6 +16,7 @@ interface AppLocals {
 
 /**
  * express.Application with modified 'locals' property
+ *
  * @see https://expressjs.com/en/api.html#app.locals
  */
 interface TunedExpressApplication extends express.Application {

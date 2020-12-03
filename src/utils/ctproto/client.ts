@@ -43,7 +43,7 @@ export default class Client<AuthData, ResponseMessage extends IResponseMessage<u
     this.socket.send(MessageFactory.create(type, payload));
   }
 
-   /**
+  /**
    * Sends a message as a response to another message
    *
    * @param messageId - id of a message to respond

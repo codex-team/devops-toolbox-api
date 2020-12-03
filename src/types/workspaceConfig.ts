@@ -1,4 +1,4 @@
-import { Workspace } from './workspace';
+import Workspace from './workspace';
 
 /**
  * App config (config.yml) structure

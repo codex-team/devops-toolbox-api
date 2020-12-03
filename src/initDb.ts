@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 import Config from './config';
 import ConfigData from './types/workspaceConfig';
 import WorkspaceModel from './database/models/workspace';
-import { Workspace } from './types/workspace';
+import Workspace from './types/workspace';
 
 /**
  * Connecting to mongodb

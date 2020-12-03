@@ -1,9 +1,8 @@
 import app from './app';
 import Config from './config';
 import { CTProtoServer } from './utils/ctproto/server';
-import { Workspace, WorkspacesController } from './types';
+import { Workspace, WorkspacesController, ApiRequest, ApiResponse, ApiOutgoingMessage } from './types';
 import WorkspacesService from './services/workspace';
-import { ApiRequest, ApiResponse, ApiOutgoingMessage } from './types/api';
 import { AuthorizeMessagePayload } from './types/api/requests/authorize';
 import { DevopsToolboxAuthData } from './types/api/responses/authorize';
 

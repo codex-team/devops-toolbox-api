@@ -12,6 +12,7 @@ export default class WorkspacesController {
    * @param message - request data
    */
   public static async getWorkspaces(message: GetWorkspacesPayload): Promise<GetWorkspacesResponsePayload> {
+    console.log('getWorkspaces request payload: ', message);
     const workspaces = await WorkspacesService.find({ authToken: '' });
 
     return {
