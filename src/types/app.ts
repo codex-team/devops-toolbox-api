@@ -2,6 +2,7 @@ import { CTProtoServer } from '../utils/ctproto/server';
 import { ApiRequest, ApiResponse, ApiOutgoingMessage } from './api';
 import { AuthorizeMessagePayload } from './api/requests/authorize';
 import { DevopsToolboxAuthData } from './api/responses/authorize';
+import express from 'express-serve-static-core';
 
 /**
  * Describes app.locals structure
@@ -23,7 +24,7 @@ interface AppLocals extends Record<string, unknown>{
  *
  * @see https://expressjs.com/en/api.html#app.locals
  */
-interface TunedExpressApplication {
+interface TunedExpressApplication extends express.Application {
   /**
    * Useful data accessible through all the application
    * Restricted by the single Request context
@@ -35,7 +36,7 @@ interface TunedExpressApplication {
  * Override the 'express' type to specify type for the modified app.locals
  */
 declare module 'express' {
-  interface Request {
+  interface Request extends express.Request {
     app: TunedExpressApplication;
   }
 }
