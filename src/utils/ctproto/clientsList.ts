@@ -1,13 +1,20 @@
 import Client from './client';
-import { MessagePayload } from './types';
-import MessageFactory from './messageFactory';
 import { CloseEventCode } from './closeEvent';
+import { NewMessage, ResponseMessage as IResponseMessage } from './types';
 
 /**
  * Method for finding a client by some external logic.
  * Will be passed to the Array.find() method
  */
-type ClientQueryCallback<AuthData> = (client: Client<AuthData>, index: number, array: Client<AuthData>[]) => boolean;
+type ClientQueryCallback<
+    AuthData,
+    ResponseMessage extends IResponseMessage<unknown>,
+    OutgoingMessage extends NewMessage<unknown>
+  > = (
+      client: Client<AuthData, ResponseMessage, OutgoingMessage>,
+      index: number,
+      array: Client<AuthData, ResponseMessage, OutgoingMessage>[]
+    ) => boolean;
 
 /**
  * Connected clients manager.
@@ -17,12 +24,14 @@ type ClientQueryCallback<AuthData> = (client: Client<AuthData>, index: number, a
  * https://en.wikipedia.org/wiki/Fluent_interface
  *
  * @template AuthData - structure described authorized client data
+ * @template ApiResponse - the type describing all available API response messages
+ * @template ApiOutgoingMessage - all available outgoing messages
  */
-export default class ClientsList<AuthData> {
+export default class ClientsList<AuthData, ResponseMessage extends IResponseMessage<unknown>, OutgoingMessage extends NewMessage<unknown>> {
   /**
    * Stores connected clients list
    */
-  private clients: Client<AuthData>[] = [];
+  private clients: Client<AuthData, ResponseMessage, OutgoingMessage>[] = [];
 
   /**
    * This property will store currently found items.
@@ -30,14 +39,14 @@ export default class ClientsList<AuthData> {
    *
    * @example  clients.find((client) => client.socket === socket ).remove();
    */
-  private cursor: Client<AuthData>[] | undefined;
+  private cursor: Client<AuthData, ResponseMessage, OutgoingMessage>[] | undefined;
 
   /**
    * Saves the new client
    *
    * @param client - client to save
    */
-  public add(client: Client<AuthData>): ClientsList<AuthData> {
+  public add(client: Client<AuthData, ResponseMessage, OutgoingMessage>): ClientsList<AuthData, ResponseMessage, OutgoingMessage> {
     this.clients.push(client);
 
     return this;
@@ -48,7 +57,7 @@ export default class ClientsList<AuthData> {
    *
    * @param queryCallback - search function
    */
-  public find(queryCallback: ClientQueryCallback<AuthData>): ClientsList<AuthData> {
+  public find(queryCallback: ClientQueryCallback<AuthData, ResponseMessage, OutgoingMessage>): ClientsList<AuthData, ResponseMessage, OutgoingMessage> {
     this.cursor = this.clients.filter(queryCallback);
 
     return this;
@@ -64,21 +73,32 @@ export default class ClientsList<AuthData> {
   /**
    * Returns found items
    */
-  public execute(): Client<AuthData>[] | undefined {
+  public execute(): Client<AuthData, ResponseMessage, OutgoingMessage>[] | undefined {
     return this.cursor;
+  }
+
+  /**
+   * Returns the first found item
+   */
+  public current(): Client<AuthData, ResponseMessage, OutgoingMessage> | undefined {
+    if (!this.cursor || this.cursor.length === 0) {
+      return undefined;
+    }
+
+    return this.cursor[0];
   }
 
   /**
    * Returns array of found items, or empty array
    */
-  public toArray(): Client<AuthData>[] {
+  public toArray(): Client<AuthData, ResponseMessage, OutgoingMessage>[] {
     return this.cursor || [];
   }
 
   /**
    * Returns array of found items, or empty array
    */
-  public remove(): ClientsList<AuthData> {
+  public remove(): ClientsList<AuthData, ResponseMessage, OutgoingMessage> {
     if (!this.cursor) {
       return this;
     }
@@ -105,13 +125,13 @@ export default class ClientsList<AuthData> {
    * @param type - message action type
    * @param payload - data to send
    */
-  public send(type: string, payload: MessagePayload): ClientsList<AuthData> {
+  public send(type: OutgoingMessage['type'], payload: OutgoingMessage['payload']): ClientsList<AuthData, ResponseMessage, OutgoingMessage> {
     if (!this.cursor) {
       return this;
     }
 
     this.cursor.forEach(client => {
-      client.socket.send(MessageFactory.create(type, payload));
+      client.send(type, payload);
     });
 
     return this;
@@ -121,14 +141,15 @@ export default class ClientsList<AuthData> {
    * Closes connection of selected clients
    *
    * @param code - close event code
+   * @param message - error message to send with closing
    */
-  public close(code = CloseEventCode.NormalClosure): ClientsList<AuthData> {
+  public close(code = CloseEventCode.NormalClosure, message = ''): ClientsList<AuthData, ResponseMessage, OutgoingMessage> {
     if (!this.cursor) {
       return this;
     }
 
     this.cursor.forEach(client => {
-      client.socket.close(code);
+      client.close(code, message);
     });
 
     return this;

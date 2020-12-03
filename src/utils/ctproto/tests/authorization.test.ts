@@ -2,7 +2,7 @@ import { CTProtoServer } from '../server';
 import { createWsMockWithMessage, socketClose, socketSend } from './ws.mock';
 import { createMessage } from './utils';
 import { CloseEventCode } from '../closeEvent';
-import { MessagePayload, NewMessage } from '../types';
+import { NewMessage, ResponseMessage } from '../types';
 import { AuthDataType, AuthRequestPayloadType } from './types/auth-mock';
 
 /**
@@ -21,7 +21,7 @@ const onMessageMock = jest.fn();
  *
  * @param message - message to imitate its accepting
  */
-function createCTProtoServerWithFirstMessage(message?: Pick<NewMessage, 'type' | 'payload'>): CTProtoServer<AuthRequestPayloadType, AuthDataType> {
+function createCTProtoServerWithFirstMessage(message?: Pick<NewMessage<unknown>, 'type' | 'payload'>): CTProtoServer<AuthRequestPayloadType, AuthDataType, NewMessage<unknown>, ResponseMessage<unknown>, NewMessage<unknown>> {
   const socketMessage = message ? createMessage(message) : undefined;
   const ws = createWsMockWithMessage(socketMessage);
 
@@ -207,13 +207,13 @@ describe('CTProtoServer', () => {
             type: 'authorize',
             payload: {
               token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
-            } as MessagePayload,
+            },
           }),
           createMessage({
             type: 'authorize',
             payload: {
               token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
-            } as MessagePayload,
+            },
           }),
         ];
         const ws = createWsMockWithMessage(undefined, messageSeries);

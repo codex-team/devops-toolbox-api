@@ -1,5 +1,6 @@
 import WorkspacesService from '../services/workspace';
-import { Workspace } from '../types';
+import { GetWorkspacesPayload } from '../types/api/requests/get-workspaces';
+import { GetWorkspacesResponsePayload } from '../types/api/responses/get-workspaces';
 
 /**
  * Workspace controller
@@ -8,9 +9,13 @@ export default class WorkspacesController {
   /**
    * Get all workspaces
    *
-   * @param userToken - User personal token to identify the owner of the workspace
+   * @param message - request data
    */
-  public static async getWorkspaces(userToken: string | undefined): Promise<Workspace [] | null> {
-    return WorkspacesService.find({ authToken: userToken });
+  public static async getWorkspaces(message: GetWorkspacesPayload): Promise<GetWorkspacesResponsePayload> {
+    const workspaces = await WorkspacesService.find({ authToken: '' });
+
+    return {
+      workspaces: workspaces || [],
+    };
   }
 }

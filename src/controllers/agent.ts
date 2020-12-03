@@ -1,8 +1,10 @@
 import express from 'express';
 import WorkspacesService from '../services/workspace';
 import { Workspace } from '../types';
+import { ApiResponse, ApiOutgoingMessage } from '../types/api';
+import { DevopsToolboxAuthData } from '../types/api/responses/authorize';
 import Client from '../utils/ctproto/client';
-import { DevopsToolboxAuthData } from '../types/auth';
+
 /**
  * Agent controller
  */
@@ -19,7 +21,7 @@ export default class AgentController {
     if (workspace) {
       req.app.locals.transport
         .clients
-        .find((client: Client<DevopsToolboxAuthData>) => client.authData.workspaceIds.includes(workspace._id))
+        .find((client: Client<DevopsToolboxAuthData, ApiResponse, ApiOutgoingMessage>) => client.authData.workspaceIds.includes(workspace._id))
         .send('workspace-updated', { workspace });
     }
 

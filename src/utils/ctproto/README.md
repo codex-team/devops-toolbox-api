@@ -82,13 +82,11 @@ To use CTProto JavaScript server implementation, follow next guide.
 
 ```ts
 import { CTProtoServer } from './ctproto/server';
-import { AuthRequestPayload, AuthData } from './ctproto/types';
-import { NewMessage } from './ctproto/types';
 
 const transport = new CTProtoServer({
   port: 4000,
   path: '/client',
-  async onAuth(authRequestPayload: AuthRequestPayload): Promise<AuthData> {
+  async onAuth(authRequestPayload){
     const user = aurhorizeUser(authRequestPayload)
 
     if (!user) {
@@ -100,7 +98,7 @@ const transport = new CTProtoServer({
     };
   },
 
-  async onMessage(message: NewMessage): Promise<void | object> {
+  async onMessage(message) {
     // massage handling
   },
 });

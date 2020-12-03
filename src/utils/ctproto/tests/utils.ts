@@ -16,12 +16,12 @@ export function createMessageId(): string {
  * @param message.type - action type
  * @param message.payload - data to send
  */
-export function createMessage({ type, payload }: Pick<NewMessage, 'type' | 'payload'>): string {
+export function createMessage({ type, payload }: Pick<NewMessage<unknown>, 'type' | 'payload'>): string {
   return JSON.stringify(
     {
       messageId: createMessageId(),
       type,
       payload,
-    } as NewMessage
+    } as NewMessage<unknown>
   );
 }

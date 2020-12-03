@@ -3,12 +3,20 @@ import ws from 'ws';
 import { CriticalError } from './errors';
 import { CloseEventCode } from './closeEvent';
 import Client from './client';
-import { NewMessage } from './types';
+import { NewMessage, ResponseMessage } from './types';
 import ClientsList from './clientsList';
 import MessageFactory from './messageFactory';
 import MessageValidator from './messageValidator';
 
-export interface CTProtoServerOptions<AuthRequestPayload, AuthData> {
+/**
+ * Available options for the CTProtoServer
+ *
+ * @template AuthRequestPayload - data used for authorization
+ * @template AuthData - data got after authorization
+ * @template ApiRequest - the type described all available API request messages
+ * @template ApiResponse - the type described all available API response messages
+ */
+export interface CTProtoServerOptions<AuthRequestPayload, AuthData, ApiRequest, ApiResponse extends ResponseMessage<unknown>> {
   /**
    * WebSocket server port
    */
@@ -30,7 +38,7 @@ export interface CTProtoServerOptions<AuthRequestPayload, AuthData> {
    * @param message - full message data
    * @returns optionally can return any data to respond to client
    */
-  onMessage: (message: NewMessage) => Promise<void | Record<string, unknown>>;
+  onMessage: (message: ApiRequest) => Promise<void | ApiResponse['payload']>;
 
   /**
    * Allows to disable validation/authorization and other warning messages
@@ -48,13 +56,19 @@ export interface CTProtoServerOptions<AuthRequestPayload, AuthData> {
  * @todo use Logger instead of console
  * @todo close broken connection ping-pong (https://github.com/websockets/ws#how-to-detect-and-close-broken-connections)
  * @todo implement the 'destroy()' method that will stop the server
+ *
+ * @template AuthRequestPayload - data used for authorization
+ * @template AuthData - data got after authorization
+ * @template ApiRequest - the type describing all available API request messages
+ * @template ApiResponse - the type describing all available API response messages
+ * @template ApiOutgoingMessage - all available outgoing messages
  */
-export class CTProtoServer<AuthRequestPayload, AuthData> {
+export class CTProtoServer<AuthRequestPayload, AuthData, ApiRequest extends NewMessage<unknown>, ApiResponse extends ResponseMessage<unknown>, ApiOutgoingMessage extends NewMessage<unknown>> {
   /**
    * Manager of currently connected clients
    * Allows to find, send and other manipulations.
    */
-  public clients = new ClientsList<AuthData>();
+  public clients = new ClientsList<AuthData, ApiResponse, ApiOutgoingMessage>();
 
   /**
    * Instance of transport-layer framework
@@ -65,7 +79,7 @@ export class CTProtoServer<AuthRequestPayload, AuthData> {
   /**
    * Configuration options passed on Transport initialization
    */
-  private options: CTProtoServerOptions<AuthRequestPayload, AuthData>;
+  private options: CTProtoServerOptions<AuthRequestPayload, AuthData, ApiRequest, ApiResponse>;
 
   /**
    * Constructor
@@ -73,7 +87,7 @@ export class CTProtoServer<AuthRequestPayload, AuthData> {
    * @param options - Transport options
    * @param WebSocketsServer - allows to override the 'ws' dependency. Used for mocking it in tests.
    */
-  constructor(options: CTProtoServerOptions<AuthRequestPayload, AuthData>, WebSocketsServer?: ws.Server) {
+  constructor(options: CTProtoServerOptions<AuthRequestPayload, AuthData, ApiRequest, ApiResponse>, WebSocketsServer?: ws.Server) {
     this.options = options;
     this.wsServer = WebSocketsServer || new ws.Server({
       port: options.port,
@@ -142,13 +156,13 @@ export class CTProtoServer<AuthRequestPayload, AuthData> {
     }
 
     const message = JSON.parse(data as string);
-    const isFirstMessage = !this.clients.find((client) => client.socket === socket).exists();
+    const client = this.clients.find((c) => c.socket === socket).current();
 
     try {
-      if (isFirstMessage) {
+      if (client === undefined) {
         this.handleFirstMessage(socket, message);
       } else {
-        this.handleAuthorizedMessage(socket, message);
+        this.handleAuthorizedMessage(client, message);
       }
     } catch (error) {
       this.log(`Error while processing a message: ${error.message}`, message);
@@ -160,7 +174,7 @@ export class CTProtoServer<AuthRequestPayload, AuthData> {
    *  - check authorization
    *  - save client
    *
-   * @param socket - connected socket
+   * @param socket - socket of connected client
    * @param message - accepted message
    */
   private async handleFirstMessage(socket: ws, message: NewMessage<AuthRequestPayload>): Promise<void> {
@@ -179,7 +193,7 @@ export class CTProtoServer<AuthRequestPayload, AuthData> {
       /**
        * Respond with success message and auth data
        */
-      socket.send(MessageFactory.respond(message.messageId, authData));
+      clientToSave.respond(message.messageId, authData);
     } catch (error) {
       socket.close(CloseEventCode.PolicyViolation, 'Authorization failed: ' + error.message);
     }
@@ -188,10 +202,10 @@ export class CTProtoServer<AuthRequestPayload, AuthData> {
   /**
    * Process not-first message.
    *
-   * @param socket - connected socket
+   * @param client - connected client
    * @param message - accepted message
    */
-  private async handleAuthorizedMessage(socket: ws, message: NewMessage): Promise<void> {
+  private async handleAuthorizedMessage(client: Client<AuthData, ApiResponse, ApiOutgoingMessage>, message: ApiRequest): Promise<void> {
     if (message.type == 'authorize') {
       return;
     }
@@ -209,7 +223,7 @@ export class CTProtoServer<AuthRequestPayload, AuthData> {
       /**
        * Respond with payload got from the onMessage handler
        */
-      socket.send(MessageFactory.respond(message.messageId, response));
+      client.respond(message.messageId, response);
     } catch (error) {
       this.log('Internal error while processing a message: ', error.message);
     }
