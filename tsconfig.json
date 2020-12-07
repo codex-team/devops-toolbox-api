@@ -6,8 +6,5 @@
     "outDir": "./build",
     "esModuleInterop": true,
     "strict": true,
-  },
-  "files": [
-    "./src/types/app.ts"
-  ]
+  }
 }
