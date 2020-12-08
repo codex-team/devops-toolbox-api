@@ -1,11 +1,12 @@
 import { nanoid } from 'nanoid';
+import { idLength } from '../messageFactory';
 import { NewMessage } from '../types';
 
 /**
  * Generates message id in CTProto format
  */
 export function createMessageId(): string {
-  return nanoid(10);
+  return nanoid(idLength);
 }
 
 /**

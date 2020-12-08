@@ -2,6 +2,11 @@ import { NewMessage, ResponseMessage } from './types';
 import { nanoid } from 'nanoid';
 
 /**
+ * Length of message id string
+ */
+export const idLength = 10;
+
+/**
  * Class for creating of messages
  */
 export default class MessageFactory {
@@ -57,6 +62,6 @@ export default class MessageFactory {
    * Creates unique message id
    */
   private static createMessageId(): string {
-    return nanoid(10);
+    return nanoid(idLength);
   }
 }

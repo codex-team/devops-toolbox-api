@@ -1,4 +1,5 @@
 import { MessageFormatError, MessageParseError } from './errors';
+import { idLength } from './messageFactory';
 
 /**
  * Provides methods for validating message
@@ -73,7 +74,7 @@ export default class MessageValidator {
    * @param messageId - id to check
    */
   private static isMessageIdValid(messageId: string): boolean {
-    if (messageId.length !== 10) {
+    if (messageId.length !== idLength) {
       return false;
     }
 
