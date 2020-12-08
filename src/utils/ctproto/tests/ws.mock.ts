@@ -13,7 +13,8 @@ export const socketOnCloseMock = jest.fn();
 /**
  * Socket .close() mock
  */
-export const socketClose = jest.fn(() => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const socketClose = jest.fn((_code: number, _message: string) => {
   socketOnCloseMock();
 });
 

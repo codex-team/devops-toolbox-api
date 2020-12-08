@@ -1,6 +1,6 @@
 import WorkspacesService from '../services/workspace';
-import { GetWorkspacesPayload } from '../types/api/requests/get-workspaces';
-import { GetWorkspacesResponsePayload } from '../types/api/responses/get-workspaces';
+import { GetWorkspacesPayload } from '../types/api/requests/getWorkspaces';
+import { GetWorkspacesResponsePayload } from '../types/api/responses/getWorkspaces';
 
 /**
  * Workspace controller

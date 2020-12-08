@@ -1,6 +1,6 @@
 import express from 'express';
 import services from './routes/services';
-import HttpError from './utils/httpError';
+import HttpError, { HttpStatusCode } from './utils/httpError';
 
 const app: express.Application = express();
 
@@ -15,7 +15,7 @@ app.use('/services', services);
  * Route error
  */
 app.use((_req: express.Request, _res: express.Response, next: express.NextFunction) => {
-  const error: HttpError = new HttpError(404, 'Not Found');
+  const error: HttpError = new HttpError(HttpStatusCode.NotFound, 'Not Found');
 
   next(error);
 });

@@ -1,8 +1,8 @@
-import GetWorkspaces from './requests/get-workspaces';
+import GetWorkspaces from './requests/getWorkspaces';
 import Authorize from './requests/authorize';
 import AuthorizeResponse from './responses/authorize';
-import GetWorkspacesResponse from './responses/get-workspaces';
-import WorkspaceUpdatedMessage from './outgoing/workspace-updated';
+import GetWorkspacesResponse from './responses/getWorkspaces';
+import WorkspaceUpdatedMessage from './outgoing/workspaceUpdated';
 
 /**
  * This file uses Discriminating Unions types for our API

@@ -58,6 +58,11 @@ describe('CTProtoServer', () => {
 
     test('should break the connection if the «authorize» is not accepted in 3 seconds', () => {
       /**
+       * Server should wait this amount of ms.
+       */
+      const authorizationWaitingTime = 3000;
+
+      /**
        * Create transport, but do not pass any message to it
        */
       createCTProtoServerWithFirstMessage();
@@ -70,7 +75,7 @@ describe('CTProtoServer', () => {
       /**
        * Fast-forward until all timers have been executed
        */
-      jest.advanceTimersByTime(3000);
+      jest.advanceTimersByTime(authorizationWaitingTime);
 
       /**
        * Now the socket.close() should have been called
@@ -127,7 +132,8 @@ describe('CTProtoServer', () => {
       const authDataMock = {
         user: '1234',
       };
-      const successfulOnAuth = jest.fn(() => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const successfulOnAuth = jest.fn((_authRequest: Record<string, string>) => {
         return Promise.resolve(authDataMock);
       });
 
