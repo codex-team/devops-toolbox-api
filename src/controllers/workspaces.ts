@@ -9,10 +9,10 @@ export default class WorkspacesController {
   /**
    * Get all workspaces
    *
-   * @param message - request data
+   * @param _message - request data
    */
-  public static async getWorkspaces(message: GetWorkspacesPayload): Promise<GetWorkspacesResponsePayload> {
-    console.log('getWorkspaces request payload: ', message);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public static async getWorkspaces(_message: GetWorkspacesPayload): Promise<GetWorkspacesResponsePayload> {
     const workspaces = await WorkspacesService.find({ authToken: '' });
 
     return {
