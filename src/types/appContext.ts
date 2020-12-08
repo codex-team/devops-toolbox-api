@@ -4,7 +4,7 @@ import type { AuthorizeMessagePayload } from './api/requests/authorize';
 import type { DevopsToolboxAuthData } from './api/responses/authorize';
 
 /**
- * Describes app.locals structure
+ * Describes app.context structure
  */
 export default interface AppContext {
   /**

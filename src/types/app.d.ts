@@ -4,9 +4,7 @@
 
 declare namespace Express {
   /**
-   * express.Application with modified 'locals' property
-   *
-   * @see https://expressjs.com/en/api.html#app.locals
+   * express.Application with context property
    */
   export interface Application {
     /**
