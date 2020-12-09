@@ -1,8 +1,6 @@
 import express from 'express';
 import WorkspacesService from '../services/workspace';
-import { Workspace, ApiResponse, ApiOutgoingMessage } from '../types';
-import { DevopsToolboxAuthData } from '../types/api/responses/authorize';
-import Client from '../utils/ctproto/client';
+import { Workspace } from '../types';
 
 /**
  * Agent controller
@@ -18,9 +16,9 @@ export default class AgentController {
     const workspace: Workspace | null = await WorkspacesService.updateServices(req.headers.authorization, req.body.services);
 
     if (workspace) {
-      req.app.locals.transport
+      req.app.context.transport
         .clients
-        .find((client: Client<DevopsToolboxAuthData, ApiResponse, ApiOutgoingMessage>) => client.authData.workspaceIds.includes(workspace._id))
+        .find((client) => client.authData.workspaceIds.includes(workspace._id))
         .send('workspace-updated', { workspace });
     }
 

@@ -11,9 +11,4 @@ export default interface AppContext {
    * CTProto server instance that is available in all controllers
    */
   transport: CTProtoServer<AuthorizeMessagePayload, DevopsToolboxAuthData, ApiRequest, ApiResponse, ApiOutgoingMessage>
-
-  /**
-   * Authenticated user data
-   */
-  user: DevopsToolboxAuthData;
 }

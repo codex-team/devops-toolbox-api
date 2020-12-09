@@ -36,12 +36,8 @@ const transport = new CTProtoServer<AuthorizeMessagePayload, DevopsToolboxAuthDa
     } as DevopsToolboxAuthData;
 
     /**
-     * Save current user to locals
-     * That allows accessing it in controllers
-     *
-     * @example req.app.locals.user
+     * @todo save user to res.locals
      */
-    app.locals.user = user;
 
     return user;
   },
