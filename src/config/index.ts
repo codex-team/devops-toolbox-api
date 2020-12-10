@@ -5,23 +5,21 @@ dotenv.config({ path: path.join(__dirname, '/../../.env') });
 /**
  * Class for settings (data from .env and etc)
  */
-class Config {
+export default class Config {
   /**
    * The Port you are using for http connection
    */
-  public static httpPort: number = +process.env.HTTP_PORT!;
+  public static httpPort: number | undefined = process.env.HTTP_PORT ? parseInt(process.env.HTTP_PORT, 10) : undefined;
   /**
    * The Port you are using for web socket connection
    */
-  public static wsPort: number = +process.env.WS_PORT!;
+  public static wsPort: number | undefined = process.env.WS_PORT ? parseInt(process.env.WS_PORT, 10) : undefined;
   /**
    * Database URL
    */
-  public static dbUrl: string = process.env.DB_URL!;
+  public static dbUrl: string = process.env.DB_URL || '';
   /**
    * Workspaces config-file path
    */
-  public static workspacesConfigPath: string = process.env.CONFIG_FILE! || path.join(__dirname, '/../config.yml');
+  public static workspacesConfigPath: string = process.env.CONFIG_FILE || '';
 }
-
-export default Config;

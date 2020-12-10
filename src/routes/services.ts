@@ -4,7 +4,7 @@ import AgentController from '../controllers/agent';
 const router: express.Router = express.Router();
 
 /**
- * Put request for update services
+ * PUT request for update services
  */
 router.put('/', AgentController.updateServices);
 

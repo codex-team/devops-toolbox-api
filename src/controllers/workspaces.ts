@@ -1,5 +1,6 @@
 import WorkspacesService from '../services/workspace';
-import Workspace from '../types/workspace';
+import { GetWorkspacesPayload } from '../types/api/requests/getWorkspaces';
+import { GetWorkspacesResponsePayload } from '../types/api/responses/getWorkspaces';
 
 /**
  * Workspace controller
@@ -8,9 +9,14 @@ export default class WorkspacesController {
   /**
    * Get all workspaces
    *
-   * @param userToken - User personal token to identify the owner of the workspace
+   * @param _message - request data
    */
-  public static async getWorkspaces(userToken: string | undefined): Promise<Workspace [] | null> {
-    return WorkspacesService.find({ authToken: userToken });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public static async getWorkspaces(_message: GetWorkspacesPayload): Promise<GetWorkspacesResponsePayload> {
+    const workspaces = await WorkspacesService.find({ authToken: '' });
+
+    return {
+      workspaces: workspaces || [],
+    };
   }
 }

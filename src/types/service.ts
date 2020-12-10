@@ -1,15 +1,17 @@
 /**
- * Interface for service
+ * Service is the working software we are watching for
+ * for example, nginx or Docker
  */
-interface Service {
+export default interface Service {
   /**
-   * Service type
+   * What kind of service represented by a payload
+   * Examples: 'nginx', 'docker' etc
    */
   type: string;
-  /**
-   * Service payload
-   */
-  payload: object | object[];
-}
 
-export default Service;
+  /**
+   * Useful data about the service
+   * collected by Agent
+   */
+  payload: Record<string, unknown>;
+}

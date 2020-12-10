@@ -1,13 +1,11 @@
 import Workspace from './workspace';
 
 /**
- * Interface for service
+ * App config (config.yml) structure
  */
-interface ConfigData {
+export default interface ConfigData {
   /**
    * Array of all workspaces from config-file
    */
   workspaces: Workspace[];
 }
-
-export default ConfigData;

@@ -1,7 +1,6 @@
 import mongoose from '../database';
 import Workspace from '../database/models/workspace';
-import IWorkspace from '../types/workspace';
-import Service from '../types/service';
+import { Workspace as IWorkspace, Service } from '../types';
 
 /**
  * Workspace service
@@ -17,6 +16,17 @@ export default class WorkspacesService {
   }
 
   /**
+   * Add new workspace
+   *
+   * @param workspace - new workspace
+   */
+  public static async add(workspace: mongoose.FilterQuery<typeof Workspace>): Promise<IWorkspace | null> {
+    const newWorkspace = new Workspace(workspace);
+
+    return newWorkspace.save();
+  }
+
+  /**
    * Update server services
    *
    * @param token - Server token
@@ -27,6 +37,7 @@ export default class WorkspacesService {
       $set: {
         'servers.$.services': actualServices,
       },
+    }, {
       new: true,
     });
   }

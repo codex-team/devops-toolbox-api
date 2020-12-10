@@ -1,38 +1,62 @@
 import app from './app';
 import Config from './config';
-import ws from 'ws';
-import Request from './types/request';
-import WorkspacesController from './controllers/workspaces';
+import { CTProtoServer } from './utils/ctproto/server';
+import { Workspace, WorkspacesController, ApiRequest, ApiResponse, ApiOutgoingMessage } from './types';
+import WorkspacesService from './services/workspace';
+import { AuthorizeMessagePayload } from './types/api/requests/authorize';
+import { DevopsToolboxAuthData } from './types/api/responses/authorize';
 
 app.listen(Config.httpPort, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${Config.httpPort}`);
 });
 
-const server = new ws.Server({
+/**
+ * Initialize CTProto server for API
+ */
+const transport = new CTProtoServer<AuthorizeMessagePayload, DevopsToolboxAuthData, ApiRequest, ApiResponse, ApiOutgoingMessage>({
   port: Config.wsPort,
-  path: '/client',
-}, () => {
-  console.log(`⚡️[server]: Server is running at ws://localhost:${Config.wsPort}/client`);
-});
+  async onAuth(authRequestPayload: AuthorizeMessagePayload): Promise<DevopsToolboxAuthData> {
+    /**
+     * Connected client's authorization token
+     */
+    const authToken = authRequestPayload.token.toString();
 
-server.on('connection', (socket, req) => {
-  socket.send('Сonnected!');
+    /**
+     * Connected client's workspaces list
+     */
+    const workspaces = await WorkspacesService.find({ authToken });
 
-  socket.on('message', async (data: string) => {
-    const dataObj: Request = JSON.parse(data.toString());
-
-    let result;
-    const userToken = req.headers['sec-websocket-protocol'];
-
-    switch (dataObj.type) {
-      case 'getWorkspaces':
-        result = await WorkspacesController.getWorkspaces(userToken);
-        break;
+    if (!workspaces?.length) {
+      throw new Error('Wrong auth token passed');
     }
 
-    socket.send(JSON.stringify({
-      messageId: dataObj.messageId,
-      response: result,
-    }));
-  });
+    const user = {
+      workspaceIds: workspaces.map((w: Workspace) => w.id),
+      userToken: authToken,
+    } as DevopsToolboxAuthData;
+
+    /**
+     * @todo save user to res.locals
+     */
+
+    return user;
+  },
+
+  async onMessage(message: ApiRequest): Promise<void | ApiResponse['payload']> {
+    /**
+     * @todo add handlers
+     */
+    switch (message.type) {
+      case 'get-workspaces':
+        return WorkspacesController.getWorkspaces(message.payload);
+    }
+  },
 });
+
+/**
+ * Save transport to locals
+ * That allows using it in controllers
+ *
+ * @example req.app.locals.transport
+ */
+app.locals.transport = transport;
