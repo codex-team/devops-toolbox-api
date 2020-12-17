@@ -1,5 +1,5 @@
-import { NewMessage, ResponseMessage } from './types';
 import { nanoid } from 'nanoid';
+import { NewMessage, ResponseMessage } from './types';
 
 /**
  * Length of message id string
