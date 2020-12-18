@@ -61,4 +61,4 @@ const transport = new CTProtoServer<AuthorizeMessagePayload, DevopsToolboxAuthDa
  *
  * @example req.app.locals.transport
  */
-app.locals.transport = transport;
+app.context = { transport };
