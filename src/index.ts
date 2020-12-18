@@ -1,3 +1,5 @@
+// eslint-disable-next-line
+/// <reference path="./types/app.d.ts" />
 import app from './app';
 import Config from './config';
 import { CTProtoServer } from './utils/ctproto/server';
@@ -59,4 +61,4 @@ const transport = new CTProtoServer<AuthorizeMessagePayload, DevopsToolboxAuthDa
  *
  * @example req.app.locals.transport
  */
-app.locals.transport = transport;
+app.context = { transport };
