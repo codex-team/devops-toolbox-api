@@ -4,7 +4,7 @@
   "description": "API service of CodeX DevOps Toolbox",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "test:clear": "jest --clearCache",
     "start": "nodemon ./src/index.ts",
     "build": "tsc",
@@ -26,6 +26,7 @@
     "@types/jest": "^26.0.15",
     "@types/node": "^14.14.2",
     "@types/ws": "^7.2.7",
+    "ctproto": "^0.0.3",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "mongoose": "^5.10.11",
