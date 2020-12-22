@@ -1,4 +1,4 @@
-import { NewMessage } from '../../../utils/ctproto/types';
+import { NewMessage } from 'ctproto/types';
 
 /**
  * Format of data for requesting user workspaces

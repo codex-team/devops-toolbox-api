@@ -1,5 +1,5 @@
 import { Workspace } from '../..';
-import { NewMessage } from '../../../utils/ctproto/types';
+import { NewMessage } from 'ctproto/types';
 
 /**
  * Data about the updated workspace

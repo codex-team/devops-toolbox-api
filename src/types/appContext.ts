@@ -1,4 +1,4 @@
-import type { CTProtoServer } from '../utils/ctproto/server';
+import type { CTProtoServer } from 'ctproto';
 import type { ApiRequest, ApiResponse, ApiOutgoingMessage } from './api';
 import type { AuthorizeMessagePayload } from './api/requests/authorize';
 import type { DevopsToolboxAuthData } from './api/responses/authorize';

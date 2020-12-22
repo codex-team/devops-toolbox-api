@@ -1,4 +1,4 @@
-import { ResponseMessage } from '../../../utils/ctproto/types';
+import { ResponseMessage } from 'ctproto/types';
 
 /**
  * This data will be saved (and returned to client)

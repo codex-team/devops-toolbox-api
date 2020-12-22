@@ -1,5 +1,5 @@
 import { Workspace } from '../..';
-import { ResponseMessage } from '../../../utils/ctproto/types';
+import { ResponseMessage } from 'ctproto/types';
 
 /**
  * What kind of data will be send as the response for 'get-workspaces' request
