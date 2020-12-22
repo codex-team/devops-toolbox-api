@@ -4,6 +4,7 @@
   "description": "API service of CodeX DevOps Toolbox",
   "main": "index.js",
   "scripts": {
+    "test": "--passWithNoTests",
     "test:clear": "jest --clearCache",
     "start": "nodemon ./src/index.ts",
     "build": "tsc",
