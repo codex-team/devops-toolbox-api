@@ -1,8 +1,8 @@
 // eslint-disable-next-line
 /// <reference path="./types/app.d.ts" />
+import { CTProtoServer } from 'ctproto';
 import app from './app';
 import Config from './config';
-import { CTProtoServer } from './utils/ctproto/server';
 import { Workspace, WorkspacesController, ApiRequest, ApiResponse, ApiOutgoingMessage } from './types';
 import WorkspacesService from './services/workspace';
 import { AuthorizeMessagePayload } from './types/api/requests/authorize';
