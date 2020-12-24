@@ -18,7 +18,7 @@ export default class AgentController {
     if (workspace) {
       req.app.context.transport
         .clients
-        .find((client) => client.authData.workspaceIds.includes(workspace._id))
+        .find((client) => client.authData.workspaceIds.includes(workspace._id.toString()))
         .send('workspace-updated', { workspace });
     }
 
