@@ -13,7 +13,7 @@ export default class AgentController {
    * @param res - response
    */
   public static async updateServices(req: express.Request, res: express.Response): Promise<void> {
-    const workspace: Workspace | null = await WorkspacesService.updateServices(req.headers.authorization, req.body.services);
+    const workspace: Workspace | null = await WorkspacesService.updateServices(req.headers.authorization, req.body.payload.services);
 
     if (workspace) {
       req.app.context.transport
