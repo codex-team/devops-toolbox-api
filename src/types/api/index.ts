@@ -3,6 +3,7 @@ import Authorize from './requests/authorize';
 import AuthorizeResponse from './responses/authorize';
 import GetWorkspacesResponse from './responses/getWorkspaces';
 import WorkspaceUpdatedMessage from './outgoing/workspaceUpdated';
+import StatusesUpdatedMessage from './outgoing/statusesUpdated';
 
 /**
  * This file uses Discriminating Unions types for our API
@@ -31,4 +32,5 @@ export type ApiResponse =
  */
 export type ApiOutgoingMessage =
   | WorkspaceUpdatedMessage
+  | StatusesUpdatedMessage
 ;
