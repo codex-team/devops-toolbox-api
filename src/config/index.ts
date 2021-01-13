@@ -22,4 +22,8 @@ export default class Config {
    * Workspaces config-file path
    */
   public static workspacesConfigPath: string = process.env.CONFIG_FILE || '';
+  /**
+   * Cron schedule
+   */
+  public static pingSchedule: string = process.env.SCHEDULE || '*/20 * * * * *';
 }
