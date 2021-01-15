@@ -7,6 +7,7 @@ import { Workspace, WorkspacesController, ApiRequest, ApiResponse, ApiOutgoingMe
 import WorkspacesService from './services/workspace';
 import { AuthorizeMessagePayload } from './types/api/requests/authorize';
 import { DevopsToolboxAuthData } from './types/api/responses/authorize';
+import workspace from './database/models/workspace';
 
 app.listen(Config.httpPort, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${Config.httpPort}`);
@@ -33,7 +34,7 @@ const transport = new CTProtoServer<AuthorizeMessagePayload, DevopsToolboxAuthDa
     }
 
     const user = {
-      workspaceIds: workspaces.map((w: Workspace) => w.id),
+      workspaces: workspaces,
       userToken: authToken,
     } as DevopsToolboxAuthData;
 
@@ -48,6 +49,7 @@ const transport = new CTProtoServer<AuthorizeMessagePayload, DevopsToolboxAuthDa
     /**
      * @todo add handlers
      */
+    console.log(message);
     switch (message.type) {
       case 'get-workspaces':
         return WorkspacesController.getWorkspaces(message.payload);

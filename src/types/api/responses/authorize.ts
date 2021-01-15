@@ -1,4 +1,5 @@
 import { ResponseMessage } from 'ctproto/types';
+import Workspace from '../../workspace';
 
 /**
  * This data will be saved (and returned to client)
@@ -8,7 +9,7 @@ export interface DevopsToolboxAuthData {
   /**
    * Owned workspaces ids
    */
-  workspaceIds: string[];
+  workspaces: Workspace[];
 
   /**
    * Current user auth token
