@@ -16,6 +16,15 @@ export default class WorkspacesService {
   }
 
   /**
+   * Find one workspaces with options
+   *
+   * @param workspaceOptions - Workspace options for looking for documents
+   */
+  public static async findOne(workspaceOptions: mongoose.FilterQuery<typeof Workspace> = {}): Promise<IWorkspace | null> {
+    return Workspace.findOne(workspaceOptions);
+  }
+
+  /**
    * Add new workspace
    *
    * @param workspace - new workspace
