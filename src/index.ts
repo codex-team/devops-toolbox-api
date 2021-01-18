@@ -49,7 +49,6 @@ const transport = new CTProtoServer<AuthorizeMessagePayload, DevopsToolboxAuthDa
     /**
      * @todo add handlers
      */
-    console.log(message);
     switch (message.type) {
       case 'get-workspaces':
         return WorkspacesController.getWorkspaces(message.payload);
