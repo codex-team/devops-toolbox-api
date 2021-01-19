@@ -7,7 +7,7 @@ import Workspace from '../../workspace';
  */
 export interface DevopsToolboxAuthData {
   /**
-   * Owned workspaces ids
+   * Owned workspaces
    */
   workspaces: Workspace[];
 
