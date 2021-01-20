@@ -2,6 +2,11 @@
 declare namespace NodeJS {
   export interface ProcessEnv {
     /**
+     * Host for listening by server
+     */
+    HOST: string,
+
+    /**
      * Application HTTP port (for REST API)
      */
     HTTP_PORT: string,
