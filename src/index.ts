@@ -8,8 +8,8 @@ import WorkspacesService from './services/workspace';
 import { AuthorizeMessagePayload } from './types/api/requests/authorize';
 import { DevopsToolboxAuthData } from './types/api/responses/authorize';
 
-app.listen(Config.httpPort, () => {
-  console.log(`⚡️[server]: Server is running at http://localhost:${Config.httpPort}`);
+app.listen(Config.httpPort, Config.host, () => {
+  console.log(`⚡️[server]: Server is running at http://${Config.host}:${Config.httpPort}`);
 });
 
 /**
