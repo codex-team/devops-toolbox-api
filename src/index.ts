@@ -16,6 +16,7 @@ app.listen(Config.httpPort, Config.host, () => {
  * Initialize CTProto server for API
  */
 const transport = new CTProtoServer<AuthorizeMessagePayload, DevopsToolboxAuthData, ApiRequest, ApiResponse, ApiOutgoingMessage>({
+  host: Config.host,
   port: Config.wsPort,
   async onAuth(authRequestPayload: AuthorizeMessagePayload): Promise<DevopsToolboxAuthData> {
     /**

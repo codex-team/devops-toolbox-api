@@ -14,11 +14,11 @@ export default class Config {
   /**
    * The Port you are using for http connection
    */
-  public static httpPort: number = parseInt(process.env.HTTP_PORT, 10);
+  public static httpPort: number = parseInt(process.env.HTTP_PORT || '3000', 10);
   /**
    * The Port you are using for web socket connection
    */
-  public static wsPort: number = parseInt(process.env.WS_PORT, 10);
+  public static wsPort: number = parseInt(process.env.WS_PORT || '3001', 10);
   /**
    * Database URL
    */

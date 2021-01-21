@@ -1515,13 +1515,14 @@ cssstyle@^2.2.0:
   dependencies:
     cssom "~0.3.6"
 
-ctproto@^0.0.3:
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/ctproto/-/ctproto-0.0.3.tgz#ed90cb8e496f1cd8d07ef5314e614177600b6415"
-  integrity sha512-NCkBtg1V3krEzUXQnLQh6q9SudOkwMLiSzHzxaD23xPQtoFCiQw0//Ptv0JEDGX+OrkmHA6DYQpQZUdqqr/6Tg==
+ctproto@^0.0.6:
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/ctproto/-/ctproto-0.0.6.tgz#89669091b14c0e7cb4034178184a9425e94d85d1"
+  integrity sha512-HJKzBPOgSefOw0C/N7LVWJYc6si9Wo0JNx1y9nfp3itHDv9598Ow9Ka3/sbGCEYGohwK1h69ondTHNVqb80HdQ==
   dependencies:
     eslint-config-codex "^1.5.2"
     nanoid "^3.1.20"
+    ts-node "^9.1.1"
     ws "^7.4.1"
 
 dashdash@^1.12.0:
@@ -5219,7 +5220,7 @@ ts-jest@^26.4.4:
     semver "7.x"
     yargs-parser "20.x"
 
-ts-node@^9.0.0:
+ts-node@^9.0.0, ts-node@^9.1.1:
   version "9.1.1"
   resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-9.1.1.tgz#51a9a450a3e959401bda5f004a72d54b936d376d"
   integrity sha512-hPlt7ZACERQGf03M253ytLY3dHbGNGrAq9qIHWUY9XHYl1z7wYngSr3OQ5xmui8o2AaxsONxIzjafLUiWBo1Fg==
