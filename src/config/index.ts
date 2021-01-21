@@ -7,13 +7,18 @@ dotenv.config({ path: path.join(__dirname, '/../../.env') });
  */
 export default class Config {
   /**
+   * Host for listening by server
+   */
+  public static host: string = process.env.HOST || '127.0.0.1';
+
+  /**
    * The Port you are using for http connection
    */
-  public static httpPort: number | undefined = process.env.HTTP_PORT ? parseInt(process.env.HTTP_PORT, 10) : undefined;
+  public static httpPort: number = parseInt(process.env.HTTP_PORT || '3000', 10);
   /**
    * The Port you are using for web socket connection
    */
-  public static wsPort: number | undefined = process.env.WS_PORT ? parseInt(process.env.WS_PORT, 10) : undefined;
+  public static wsPort: number = parseInt(process.env.WS_PORT || '3001', 10);
   /**
    * Database URL
    */
