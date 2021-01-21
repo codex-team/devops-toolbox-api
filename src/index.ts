@@ -4,20 +4,21 @@ import { CTProtoServer } from 'ctproto';
 import app from './app';
 import cron from 'node-cron';
 import Config from './config';
-import { Workspace, WorkspacesController, ApiRequest, ApiResponse, ApiOutgoingMessage } from './types';
+import { WorkspacesController, ApiRequest, ApiResponse, ApiOutgoingMessage } from './types';
 import WorkspacesService from './services/workspace';
 import StatusesController from './controllers/statuses';
 import { AuthorizeMessagePayload } from './types/api/requests/authorize';
 import { DevopsToolboxAuthData } from './types/api/responses/authorize';
 
-app.listen(Config.httpPort, () => {
-  console.log(`⚡️[server]: Server is running at http://localhost:${Config.httpPort}`);
+app.listen(Config.httpPort, Config.host, () => {
+  console.log(`⚡️[server]: Server is running at http://${Config.host}:${Config.httpPort}`);
 });
 
 /**
  * Initialize CTProto server for API
  */
 const transport = new CTProtoServer<AuthorizeMessagePayload, DevopsToolboxAuthData, ApiRequest, ApiResponse, ApiOutgoingMessage>({
+  host: Config.host,
   port: Config.wsPort,
   async onAuth(authRequestPayload: AuthorizeMessagePayload): Promise<DevopsToolboxAuthData> {
     /**
@@ -35,7 +36,7 @@ const transport = new CTProtoServer<AuthorizeMessagePayload, DevopsToolboxAuthDa
     }
 
     const user = {
-      workspaceIds: workspaces.map((w: Workspace) => w.id),
+      workspaces: workspaces,
       userToken: authToken,
     } as DevopsToolboxAuthData;
 
