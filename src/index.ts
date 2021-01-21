@@ -3,7 +3,7 @@
 import { CTProtoServer } from 'ctproto';
 import app from './app';
 import Config from './config';
-import { Workspace, WorkspacesController, ApiRequest, ApiResponse, ApiOutgoingMessage } from './types';
+import { WorkspacesController, ApiRequest, ApiResponse, ApiOutgoingMessage } from './types';
 import WorkspacesService from './services/workspace';
 import { AuthorizeMessagePayload } from './types/api/requests/authorize';
 import { DevopsToolboxAuthData } from './types/api/responses/authorize';
@@ -34,7 +34,7 @@ const transport = new CTProtoServer<AuthorizeMessagePayload, DevopsToolboxAuthDa
     }
 
     const user = {
-      workspaceIds: workspaces.map((w: Workspace) => w.id),
+      workspaces: workspaces,
       userToken: authToken,
     } as DevopsToolboxAuthData;
 
