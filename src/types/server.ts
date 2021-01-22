@@ -1,4 +1,5 @@
 import Service from './service';
+import SSHConnectionInfo from './SSHConnectionInfo';
 
 /**
  * Interface for server
@@ -14,6 +15,11 @@ export default interface Server {
    * given on server creation
    */
   token: string;
+
+  /**
+   * Information for SSH connection to server
+   */
+  sshConnectionInfo: SSHConnectionInfo;
 
   /**
    * List of services running on the server
