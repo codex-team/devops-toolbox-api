@@ -1,8 +1,8 @@
 import app from './../app';
 import axios from 'axios';
-import mongoose from 'mongoose';
 import WorkspacesService from './../services/workspace';
 import ServiceStatus from './../types/serviceStatus';
+import Workspace from './../types/workspace';
 
 /**
  * Statuses controller
@@ -16,20 +16,17 @@ export default class StatusesController {
     const services: string[] = [];
 
     for (const user of users) {
-      const workspaces: string[] = user.authData.workspaceIds;
+      const workspaces: Workspace[] = user.authData.workspaces;
 
       for (const workspace of workspaces) {
-        const workspaceId = mongoose.Types.ObjectId(workspace);
-        const ws = await WorkspacesService.findOne({ _id: workspaceId });
+        const ws = await WorkspacesService.findOne({ _id: workspace._id });
 
         if (ws) {
           const servers = ws.servers;
 
           for (const server of servers) {
             for (const service of server.services) {
-              const payloads = service.payload;
-
-              for (const payload of payloads) {
+              for (const payload of service.payload) {
                 services.push(payload.serverName as string);
               }
             }
@@ -52,7 +49,9 @@ export default class StatusesController {
     const statuses: ServiceStatus[] = [];
 
     for (const service of services) {
-      await axios.get(service)
+      const axiosReq = 'https://' + service;
+
+      await axios.get(axiosReq)
         .then((axiosRes) => {
           if (axiosRes.statusText === 'OK') {
             statuses.push({
@@ -62,7 +61,7 @@ export default class StatusesController {
           } else {
             statuses.push({
               name: service,
-              isOnline: true,
+              isOnline: false,
             });
           }
         });
