@@ -30,5 +30,5 @@ export default class Config {
   /**
    * Cron schedule
    */
-  public static pingSchedule: string = process.env.SCHEDULE || '*/20 * * * * *';
+  public static pingSchedule: string = process.env.PING_SCHEDULE || '*/30 * * * * *';
 }

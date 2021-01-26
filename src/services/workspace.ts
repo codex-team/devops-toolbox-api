@@ -16,7 +16,7 @@ export default class WorkspacesService {
   }
 
   /**
-   * Find one workspaces with options
+   * Find one workspace with options
    *
    * @param workspaceOptions - Workspace options for looking for documents
    */
