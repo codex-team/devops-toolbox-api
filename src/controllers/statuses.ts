@@ -2,7 +2,7 @@ import app from './../app';
 import axios from 'axios';
 import WorkspacesService from './../services/workspace';
 import ServiceStatus from './../types/serviceStatus';
-import Workspace from './../types/workspace';
+import IWorkspace from './../types/workspace';
 
 /**
  * Statuses controller
@@ -13,30 +13,37 @@ export default class StatusesController {
    */
   public static async updateStatuses(): Promise<void> {
     const users = app.context.transport.clients.toArray();
-    const services: string[] = [];
 
     for (const user of users) {
-      const workspaces: Workspace[] = user.authData.workspaces;
+      const workspaces: IWorkspace[] = user.authData.workspaces;
 
       for (const workspace of workspaces) {
-        const ws = await WorkspacesService.findOne({ _id: workspace._id });
-
-        if (ws) {
-          const servers = ws.servers;
-
-          for (const server of servers) {
-            for (const service of server.services) {
-              for (const payload of service.payload) {
-                services.push(payload.serverName as string);
-              }
-            }
-          }
-        }
+        await WorkspacesService.findOne({ _id: workspace._id })
+          .then(async (ws) => {
+            await WorkspacesService.aggregateServices(
+              [
+                {
+                  $match: {
+                    _id: ws?._id,
+                  },
+                }, {
+                  $group: {
+                    _id: null,
+                    servicesList: {
+                      $push: '$servers.services.payload.serverName',
+                    },
+                  },
+                },
+              ]
+            )
+              .then((servicesAggregation) => {
+                this.checkingServicesAvailability(servicesAggregation[0].servicesList.flat(Infinity))
+                  .then((statuses) => {
+                    this.sendStatuses(statuses, user);
+                  });
+              });
+          });
       }
-      this.checkingServicesAvailability(services)
-        .then((statuses) => {
-          this.sendStatuses(statuses, user);
-        });
     }
   }
 
