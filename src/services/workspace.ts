@@ -1,6 +1,7 @@
 import mongoose from '../database';
 import Workspace from '../database/models/workspace';
 import { Workspace as IWorkspace, Service } from '../types';
+import ServicesAggregation from '../types/servicesAggregation';
 
 /**
  * Workspace service
@@ -22,6 +23,15 @@ export default class WorkspacesService {
    */
   public static async findOne(workspaceOptions: mongoose.FilterQuery<typeof Workspace> = {}): Promise<IWorkspace | null> {
     return Workspace.findOne(workspaceOptions);
+  }
+
+  /**
+   * Aggregate workspaces by different pipelines
+   *
+   * @param pipeline - condition for selection workspaces
+   */
+  public static async aggregateServices(pipeline: any): Promise<ServicesAggregation[]> {
+    return Workspace.aggregate(pipeline);
   }
 
   /**
