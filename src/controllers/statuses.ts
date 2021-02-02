@@ -3,6 +3,9 @@ import axios from 'axios';
 import WorkspacesService from './../services/workspace';
 import ServiceStatus from './../types/serviceStatus';
 import IWorkspace from './../types/workspace';
+import Client from 'ctproto/build/src/server/client';
+import { DevopsToolboxAuthData } from '../types/api/responses/authorize';
+import { ApiOutgoingMessage, ApiResponse } from '../types';
 
 /**
  * Statuses controller
@@ -18,18 +21,14 @@ export default class StatusesController {
       const workspaces: IWorkspace[] = user.authData.workspaces;
 
       for (const workspace of workspaces) {
-        await WorkspacesService.findOne({ _id: workspace._id })
-          .then(async (ws) => {
-            if (ws) {
-              await WorkspacesService.aggregateServices(ws._id)
-                .then((servicesAggregation) => {
-                  this.checkingServicesAvailability(servicesAggregation[0].servicesList.flat(Infinity))
-                    .then((statuses) => {
-                      this.sendStatuses(statuses, user);
-                    });
-                });
-            }
-          });
+        const ws = await WorkspacesService.findOne({ _id: workspace._id });
+
+        if (ws) {
+          const servicesAggregation = await WorkspacesService.aggregateServices(ws._id);
+          const statuses = await this.checkingServicesAvailability(servicesAggregation[0].servicesList.flat(Infinity));
+
+          this.sendStatuses(statuses, user);
+        }
       }
     }
   }
@@ -45,20 +44,19 @@ export default class StatusesController {
     for (const service of services) {
       const axiosReq = 'https://' + service;
 
-      await axios.get(axiosReq)
-        .then((axiosRes) => {
-          if (axiosRes.statusText === 'OK') {
-            statuses.push({
-              name: service,
-              isOnline: true,
-            });
-          } else {
-            statuses.push({
-              name: service,
-              isOnline: false,
-            });
-          }
+      const axiosRes = await axios.get(axiosReq);
+
+      if (axiosRes.statusText === 'OK') {
+        statuses.push({
+          name: service,
+          isOnline: true,
         });
+      } else {
+        statuses.push({
+          name: service,
+          isOnline: false,
+        });
+      }
     }
 
     return statuses;
@@ -70,7 +68,7 @@ export default class StatusesController {
    * @param statuses - array of statuses of all client services
    * @param user - user
    */
-  public static sendStatuses(statuses: ServiceStatus[], user: any): void {
+  public static sendStatuses(statuses: ServiceStatus[], user: Client<DevopsToolboxAuthData, ApiResponse, ApiOutgoingMessage>): void {
     if (typeof user.authData.userToken === 'string') {
       app.context.transport
         .clients
