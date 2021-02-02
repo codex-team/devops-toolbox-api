@@ -20,28 +20,15 @@ export default class StatusesController {
       for (const workspace of workspaces) {
         await WorkspacesService.findOne({ _id: workspace._id })
           .then(async (ws) => {
-            await WorkspacesService.aggregateServices(
-              [
-                {
-                  $match: {
-                    _id: ws?._id,
-                  },
-                }, {
-                  $group: {
-                    _id: null,
-                    servicesList: {
-                      $push: '$servers.services.payload.serverName',
-                    },
-                  },
-                },
-              ]
-            )
-              .then((servicesAggregation) => {
-                this.checkingServicesAvailability(servicesAggregation[0].servicesList.flat(Infinity))
-                  .then((statuses) => {
-                    this.sendStatuses(statuses, user);
-                  });
-              });
+            if (ws) {
+              await WorkspacesService.aggregateServices(ws._id)
+                .then((servicesAggregation) => {
+                  this.checkingServicesAvailability(servicesAggregation[0].servicesList.flat(Infinity))
+                    .then((statuses) => {
+                      this.sendStatuses(statuses, user);
+                    });
+                });
+            }
           });
       }
     }

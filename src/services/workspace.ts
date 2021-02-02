@@ -28,10 +28,23 @@ export default class WorkspacesService {
   /**
    * Aggregate workspaces by different pipelines
    *
-   * @param pipeline - condition for selection workspaces
+   * @param id - id of aggregating workspace
    */
-  public static async aggregateServices(pipeline: any): Promise<ServicesAggregation[]> {
-    return Workspace.aggregate(pipeline);
+  public static async aggregateServices(id: mongoose.Types.ObjectId): Promise<ServicesAggregation[]> {
+    return Workspace.aggregate([
+      {
+        $match: {
+          _id: id,
+        },
+      }, {
+        $group: {
+          _id: null,
+          servicesList: {
+            $push: '$servers.services.payload.serverName',
+          },
+        },
+      },
+    ]);
   }
 
   /**
