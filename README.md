@@ -71,7 +71,7 @@ Route for updating the information about the services running of observed server
 
 ### CTProto API
 
-The communication between the backend and clients is going through the [CodeX Transport Protocol](src/utils/ctproto).
+The communication between the backend and clients is going through the [CodeX Transport Protocol](https://github.com/codex-team/ctproto).
 
 All supported messages will be listed below.
 
