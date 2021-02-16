@@ -18,18 +18,16 @@ app.listen(Config.httpPort, Config.host, () => {
  * Initialize CTProto server for API
  */
 const transport = new CTProtoServer<AuthorizeMessagePayload, DevopsToolboxAuthData, ApiRequest, ApiResponse, ApiOutgoingMessage>({
-  host: Config.host,
   port: Config.wsPort,
   async onAuth(authRequestPayload: AuthorizeMessagePayload): Promise<DevopsToolboxAuthData> {
     /**
      * Connected client's authorization token
      */
     const authToken = authRequestPayload.token.toString();
-
     /**
      * Connected client's workspaces list
      */
-    const workspaces = await WorkspacesService.find({ authToken });
+    const workspaces = await WorkspacesService.find({});
 
     if (!workspaces?.length) {
       throw new Error('Wrong auth token passed');

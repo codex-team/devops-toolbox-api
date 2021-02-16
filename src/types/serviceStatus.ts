@@ -1,6 +1,8 @@
 /**
  * Status of service in workspace
  */
+import * as mongoose from 'mongoose';
+
 export default interface ServiceStatus {
   /**
    * Name of service
@@ -11,4 +13,6 @@ export default interface ServiceStatus {
    * State of service (online/offline)
    */
   isOnline: boolean;
+
+  _id: mongoose.Types.ObjectId;
 }

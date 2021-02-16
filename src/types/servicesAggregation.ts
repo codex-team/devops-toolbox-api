@@ -5,10 +5,11 @@ export default interface ServicesAggregation {
   /**
    * ID of aggregation
    */
-  id: null;
+  _id: string;
 
   /**
    * List of services
    */
-  servicesList: any;
+  servicesList: any
+  ;
 }

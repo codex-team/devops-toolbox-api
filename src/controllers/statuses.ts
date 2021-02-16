@@ -1,11 +1,12 @@
+import ping from 'ping';
 import app from './../app';
-import axios from 'axios';
 import WorkspacesService from './../services/workspace';
 import ServiceStatus from './../types/serviceStatus';
 import IWorkspace from './../types/workspace';
 import Client from 'ctproto/build/src/server/client';
 import { DevopsToolboxAuthData } from '../types/api/responses/authorize';
 import { ApiOutgoingMessage, ApiResponse } from '../types';
+import mongoose from '../database';
 
 /**
  * Statuses controller
@@ -15,7 +16,7 @@ export default class StatusesController {
    * Update statuses and send to logged users
    */
   public static async updateStatuses(): Promise<void> {
-    const users = app.context.transport.clients.toArray();
+    const users = app.context.transport.clients.find(client => !!client).toArray();
 
     for (const user of users) {
       const workspaces: IWorkspace[] = user.authData.workspaces;
@@ -24,10 +25,21 @@ export default class StatusesController {
         const ws = await WorkspacesService.findOne({ _id: workspace._id });
 
         if (ws) {
-          const servicesAggregation = await WorkspacesService.aggregateServices(ws._id);
-          const statuses = await this.checkingServicesAvailability(servicesAggregation[0].servicesList.flat(Infinity));
+          const servers = await WorkspacesService.aggregateServices(ws._id);
 
-          this.sendStatuses(statuses, user);
+          // console.log(servers);
+          // console.log(servers[0].servicesList[0].projectName[0]);
+
+          for (const server of servers) {
+            const services = server.servicesList[0].projectName[0].flat(Infinity);
+            const statuses = await this.checkingServicesAvailability(services, server.servicesList[0]._id[0]);
+
+            // console.log(statuses);
+            await WorkspacesService.updateServicesStatuses(server._id, statuses);
+          }
+          // console.log(servicesAggregation[0].servicesList[0].serverToken);
+          // console.log(statuses);
+          // this.sendStatuses(statuses, user);
         }
       }
     }
@@ -37,26 +49,20 @@ export default class StatusesController {
    * Service availability check
    *
    * @param services - array of workspace services
+   * @param id - service id
    */
-  public static async checkingServicesAvailability(services: string[]): Promise<ServiceStatus[]> {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  public static async checkingServicesAvailability(services:string[], id:mongoose.Types.ObjectId): Promise<ServiceStatus[]> {
     const statuses: ServiceStatus[] = [];
 
     for (const service of services) {
-      const axiosReq = 'https://' + service;
+      const pingService = await ping.promise.probe(service);
 
-      const axiosRes = await axios.get(axiosReq);
-
-      if (axiosRes.statusText === 'OK') {
-        statuses.push({
-          name: service,
-          isOnline: true,
-        });
-      } else {
-        statuses.push({
-          name: service,
-          isOnline: false,
-        });
-      }
+      statuses.push({
+        name: service,
+        isOnline: pingService.alive,
+        _id: id,
+      });
     }
 
     return statuses;

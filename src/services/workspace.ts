@@ -2,6 +2,7 @@ import mongoose from '../database';
 import Workspace from '../database/models/workspace';
 import { Workspace as IWorkspace, Service } from '../types';
 import ServicesAggregation from '../types/servicesAggregation';
+import ServiceStatus from '../types/serviceStatus';
 
 /**
  * Workspace service
@@ -36,12 +37,21 @@ export default class WorkspacesService {
         $match: {
           _id: id,
         },
-      }, {
+      },
+      {
+        $unwind: '$servers',
+      },
+      {
         $group: {
-          _id: null,
+          _id: '$servers.token',
+
           servicesList: {
-            $push: '$servers.services.payload.serverName',
+            $push: {
+              _id: '$servers.services._id',
+              projectName: '$servers.services.payload.serverName',
+            },
           },
+
         },
       },
     ]);
@@ -72,5 +82,33 @@ export default class WorkspacesService {
     }, {
       new: true,
     });
+  }
+
+  /**
+   * Update server services' statuses
+   *
+   * @param serverToken - token of the server,where we are updating workspaces
+   * @param serviceStatus - array of services' names and statuses
+   */
+  public static async updateServicesStatuses(serverToken: string | undefined, serviceStatus: ServiceStatus[]): Promise<void> {
+    for (const service of serviceStatus) {
+      console.log(service.name);
+      await Workspace.update({
+        name: 'CodeX',
+      }, {
+        $set: {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          'servers.$[service.token].services.$[servers.services._id].payload.$[servers.services.payload.serverName].status': service.isOnline,
+        },
+      }, {
+        new: true,
+        arrayFilters: [ {
+          'servers.token': serverToken,
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          'servers.services._id': service._id,
+          'servers.services.payload.serverName': service.name,
+        } ],
+      });
+    }
   }
 }
