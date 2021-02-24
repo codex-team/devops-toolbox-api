@@ -1,9 +1,7 @@
 import mongoose from '../database';
 import Workspace from '../database/models/workspace';
-import ProjectStatus from '../database/models/serverServicesStatuses';
 import { Workspace as IWorkspace, Service } from '../types';
 import ServicesAggregation from '../types/servicesAggregation';
-import ServiceStatus from '../types/serviceStatus';
 
 /**
  * Workspace service

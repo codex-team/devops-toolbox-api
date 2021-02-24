@@ -23,7 +23,7 @@ export default class ServerService {
   }
 
   /**
-   * @param serviceStatus
+   * @param serviceStatus - services' statuses and server token
    */
   public static async updateServicesStatuses(serviceStatus: IServiceStatus): Promise<mongoose.Document> {
     if (!(await ServiceStatus.findOne({ serverToken: serviceStatus.serverToken }))) {
