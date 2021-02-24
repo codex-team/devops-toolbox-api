@@ -10,6 +10,5 @@ export default interface ServicesAggregation {
   /**
    * List of services
    */
-  servicesList: any
-  ;
+  servicesList: any;
 }

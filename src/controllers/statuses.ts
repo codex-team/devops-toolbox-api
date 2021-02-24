@@ -1,12 +1,12 @@
 import ping from 'ping';
 import app from './../app';
 import WorkspacesService from './../services/workspace';
-import ServiceStatus from './../types/serviceStatus';
+import ServiceStatus, { Projects } from './../types/serviceStatus';
 import IWorkspace from './../types/workspace';
 import Client from 'ctproto/build/src/server/client';
 import { DevopsToolboxAuthData } from '../types/api/responses/authorize';
 import { ApiOutgoingMessage, ApiResponse } from '../types';
-import mongoose from '../database';
+import ServerService from '../services/server';
 
 /**
  * Statuses controller
@@ -25,21 +25,17 @@ export default class StatusesController {
         const ws = await WorkspacesService.findOne({ _id: workspace._id });
 
         if (ws) {
-          const servers = await WorkspacesService.aggregateServices(ws._id);
+          const workspaceAggregations = await WorkspacesService.aggregateServices(ws._id);
 
-          // console.log(servers);
-          // console.log(servers[0].servicesList[0].projectName[0]);
+          for (const workspaceAggregation of workspaceAggregations) {
+            const serverServicesStatuses: ServiceStatus = {} as ServiceStatus;
+            const serviceList = workspaceAggregation.servicesList[0].projectName.flat(Infinity);
+            const serviceStatuses = await this.checkingServicesAvailability(serviceList);
 
-          for (const server of servers) {
-            const services = server.servicesList[0].projectName[0].flat(Infinity);
-            const statuses = await this.checkingServicesAvailability(services, server.servicesList[0]._id[0]);
-
-            // console.log(statuses);
-            await WorkspacesService.updateServicesStatuses(server._id, statuses);
+            serverServicesStatuses.serverToken = workspaceAggregation._id;
+            serverServicesStatuses.services = serviceStatuses;
+            await ServerService.updateServicesStatuses(serverServicesStatuses);
           }
-          // console.log(servicesAggregation[0].servicesList[0].serverToken);
-          // console.log(statuses);
-          // this.sendStatuses(statuses, user);
         }
       }
     }
@@ -48,20 +44,17 @@ export default class StatusesController {
   /**
    * Service availability check
    *
-   * @param services - array of workspace services
-   * @param id - service id
+   * @param serverProjects - array of workspace server's services
    */
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  public static async checkingServicesAvailability(services:string[], id:mongoose.Types.ObjectId): Promise<ServiceStatus[]> {
-    const statuses: ServiceStatus[] = [];
+  public static async checkingServicesAvailability(serverProjects:string[]): Promise<Projects[]> {
+    const statuses:Projects[] = [];
 
-    for (const service of services) {
-      const pingService = await ping.promise.probe(service);
+    for (const serverProject of serverProjects) {
+      const pingService = await ping.promise.probe(serverProject);
 
       statuses.push({
-        name: service,
+        name: serverProject,
         isOnline: pingService.alive,
-        _id: id,
       });
     }
 

@@ -1,18 +1,28 @@
-/**
- * Status of service in workspace
- */
 import * as mongoose from 'mongoose';
 
-export default interface ServiceStatus {
+/**
+ * Services of the server
+ */
+export interface Projects {
   /**
    * Name of service
    */
   name: string;
-
   /**
    * State of service (online/offline)
    */
   isOnline: boolean;
-
-  _id: mongoose.Types.ObjectId;
+}
+/**
+ * Status of service in workspace
+ */
+export default interface ServiceStatus extends mongoose.Document {
+  /**
+   * Server's (containing the services) id
+   */
+  serverToken: string;
+  /**
+   * Services of the server
+   */
+  services:Projects[];
 }
