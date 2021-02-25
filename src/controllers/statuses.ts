@@ -32,8 +32,6 @@ export default class StatusesController {
 
           for (const workspaceAggregation of workspaceAggregations) {
             const serverServicesStatuses: ServiceStatus = {} as ServiceStatus;
-
-            console.log(workspaceAggregation, '123');
             const serviceList = workspaceAggregation.servicesList[0].projectName.flat(Infinity);
             const serviceStatuses = await this.checkingServicesAvailability(serviceList);
 
@@ -56,7 +54,6 @@ export default class StatusesController {
 
     for (const serverProject of serverProjects) {
       const pingService = await ping.promise.probe(serverProject);
-      console.log(pingService);
       statuses.push({
         name: serverProject,
         isOnline: pingService.alive,
