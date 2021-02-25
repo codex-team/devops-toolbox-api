@@ -1,14 +1,9 @@
-/**
- * Update server services' statuses
- *
- * @param serviceStatus - array of services' names and statuses
- */
 import IServiceStatus from '../types/serviceStatus';
 import mongoose from '../database';
 import ServiceStatus from '../database/models/serverServicesStatuses';
 
 /**
- * Server service
+ * Server of workspace
  */
 export default class ServerService {
   /**
@@ -23,6 +18,8 @@ export default class ServerService {
   }
 
   /**
+   * Update of services' statuses in DB
+   *
    * @param serviceStatus - services' statuses and server token
    */
   public static async updateServicesStatuses(serviceStatus: IServiceStatus): Promise<mongoose.Document> {

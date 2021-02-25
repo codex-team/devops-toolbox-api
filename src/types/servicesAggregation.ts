@@ -10,5 +10,6 @@ export default interface ServicesAggregation {
   /**
    * List of services
    */
-  servicesList: unknown;
+  /* eslint-disable  @typescript-eslint/no-explicit-any */
+  servicesList: any;
 }

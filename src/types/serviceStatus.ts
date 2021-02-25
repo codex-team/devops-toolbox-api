@@ -24,5 +24,5 @@ export default interface ServiceStatus extends mongoose.Document {
   /**
    * Services of the server
    */
-  services:Projects[];
+  services: Projects[];
 }

@@ -28,7 +28,7 @@ export default class Config {
    */
   public static workspacesConfigPath: string = process.env.CONFIG_FILE || '';
   /**
-   * Cron schedule
+   * Cron schedule for setting pinging interval
    */
   public static pingSchedule: string = process.env.PING_SCHEDULE || '*/30 * * * * *';
 }
