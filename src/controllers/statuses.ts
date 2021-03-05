@@ -9,7 +9,7 @@ import { ApiOutgoingMessage, ApiResponse } from '../types';
 import ServerService from '../services/server';
 
 /**
- * Statuses controller
+ * Statuses controller to work with updating/checking/sending statuses of servers' statuses for each workspace
  */
 export default class StatusesController {
   /**
@@ -18,6 +18,9 @@ export default class StatusesController {
   public static async updateStatuses(): Promise<void> {
     const workspaces: IWorkspace[] | null = await WorkspacesService.find({});
 
+    /**
+     * If workspaces exist,then updating statuses for them
+     */
     if (workspaces) {
       for (const workspace of workspaces) {
         const ws = await WorkspacesService.findOne({ _id: workspace._id });
@@ -28,6 +31,9 @@ export default class StatusesController {
          */
           const workspaceAggregations = await WorkspacesService.aggregateServices(ws._id);
 
+          /**
+           * For each object with serverId and projects of the server update statuses
+           */
           for (const workspaceAggregation of workspaceAggregations) {
             const serverServicesStatuses: ServiceStatus = {} as ServiceStatus;
             const serviceList = workspaceAggregation.servicesList[0].projectName.flat(Infinity);
