@@ -24,4 +24,4 @@ const serverServicesStatusesSchema: mongoose.Schema = new mongoose.Schema({
   } ],
 });
 
-export default mongoose.model<ServiceStatus>('serverServicesStatuses', serverServicesStatusesSchema);
+export default mongoose.model<ServiceStatus>('service_statuses', serverServicesStatusesSchema);
