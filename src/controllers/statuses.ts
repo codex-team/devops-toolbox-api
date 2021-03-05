@@ -16,18 +16,16 @@ export default class StatusesController {
    * Update statuses and send to logged users
    */
   public static async updateStatuses(): Promise<void> {
-    const users = app.context.transport.clients.find(client => !!client).toArray();
+    const workspaces: IWorkspace[] | null = await WorkspacesService.find({});
 
-    for (const user of users) {
-      const workspaces: IWorkspace[] = user.authData.workspaces;
-
+    if (workspaces) {
       for (const workspace of workspaces) {
         const ws = await WorkspacesService.findOne({ _id: workspace._id });
 
         if (ws) {
-          /**
-           * Get workspace servers and their projects
-           */
+        /**
+         * Get workspace servers and their projects
+         */
           const workspaceAggregations = await WorkspacesService.aggregateServices(ws._id);
 
           for (const workspaceAggregation of workspaceAggregations) {
@@ -54,6 +52,7 @@ export default class StatusesController {
 
     for (const serverProject of serverProjects) {
       const pingService = await ping.promise.probe(serverProject);
+
       statuses.push({
         name: serverProject,
         isOnline: pingService.alive,
