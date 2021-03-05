@@ -23,26 +23,22 @@ export default class StatusesController {
      */
     if (workspaces) {
       for (const workspace of workspaces) {
-        const ws = await WorkspacesService.findOne({ _id: workspace._id });
-
-        if (ws) {
         /**
          * Get workspace servers and their projects
          */
-          const workspaceAggregations = await WorkspacesService.aggregateServices(ws._id);
+        const workspaceAggregations = await WorkspacesService.aggregateServices(workspace._id);
 
-          /**
-           * For each object with serverId and projects of the server update statuses
-           */
-          for (const workspaceAggregation of workspaceAggregations) {
-            const serverServicesStatuses: ServiceStatus = {} as ServiceStatus;
-            const serviceList = workspaceAggregation.servicesList[0].projectName.flat(Infinity);
-            const serviceStatuses = await this.checkingServicesAvailability(serviceList);
+        /**
+         * For each object with serverId and projects of the server update statuses
+         */
+        for (const workspaceAggregation of workspaceAggregations) {
+          const serverServicesStatuses: ServiceStatus = {} as ServiceStatus;
+          const serviceList = workspaceAggregation.servicesList[0].projectName.flat(Infinity);
+          const serviceStatuses = await this.checkingServicesAvailability(serviceList);
 
-            serverServicesStatuses.serverToken = workspaceAggregation._id;
-            serverServicesStatuses.services = serviceStatuses;
-            await ServerService.updateServicesStatuses(serverServicesStatuses);
-          }
+          serverServicesStatuses.serverToken = workspaceAggregation._id;
+          serverServicesStatuses.services = serviceStatuses;
+          await ServerService.updateServicesStatuses(serverServicesStatuses);
         }
       }
     }
