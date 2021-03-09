@@ -33,12 +33,16 @@ export default class StatusesController {
          */
         for (const workspaceAggregation of workspaceAggregations) {
           const serverServicesStatuses: ServiceStatus = {} as ServiceStatus;
-          const serviceList = workspaceAggregation.servicesList[0].projectName.flat(Infinity);
-          const serviceStatuses = await this.checkingServicesAvailability(serviceList);
 
-          serverServicesStatuses.serverToken = workspaceAggregation._id;
-          serverServicesStatuses.services = serviceStatuses;
-          await ServerService.updateServicesStatuses(serverServicesStatuses);
+          for (const service of workspaceAggregation.servicesList) {
+            const serviceList = service.projectName.flat(Infinity);
+
+            const serviceStatuses = await this.checkingServicesAvailability(serviceList);
+
+            serverServicesStatuses.serverToken = workspaceAggregation._id;
+            serverServicesStatuses.services = serviceStatuses;
+            await ServerService.updateServicesStatuses(serverServicesStatuses);
+          }
         }
       }
     }
