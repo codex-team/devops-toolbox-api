@@ -6,12 +6,15 @@ import ServiceStatus from '../../types/serviceStatus';
  */
 const serverServicesStatusesSchema: mongoose.Schema = new mongoose.Schema({
   /**
-   * Workspace servers' services' statuses
+   * Workspace server's token
    */
   serverToken: {
     type: String,
     required: true,
   },
+  /**
+   * Workspace server's projects' names and statuses
+   */
   services: [ {
     name: {
       type: String,

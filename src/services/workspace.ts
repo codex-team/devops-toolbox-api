@@ -26,7 +26,7 @@ export default class WorkspacesService {
   }
 
   /**
-   * Aggregate workspaces by different pipelines
+   * Sharing workspace to objects with id(server token),list of projects and type of service
    *
    * @param id - id of aggregating workspace
    */
