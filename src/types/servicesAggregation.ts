@@ -8,8 +8,10 @@ export default interface ServicesAggregation {
   _id: string;
 
   /**
-   * List of services
+   * List of projects with type of service
    */
-  /* eslint-disable  @typescript-eslint/no-explicit-any */
-  servicesList: any;
+  servicesList: {
+    type: string,
+    projectName: string[],
+  };
 }

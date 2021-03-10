@@ -3,9 +3,9 @@ import mongoose from '../database';
 import ServiceStatus from '../database/models/serverServicesStatuses';
 
 /**
- * Server of workspace
+ * Server of workspace with token,services and projects
  */
-export default class ServerService {
+export default class Server {
   /**
    * Add new server
    *
@@ -20,18 +20,20 @@ export default class ServerService {
   /**
    * Update of services' statuses in DB
    *
-   * @param serviceStatus - services' statuses and server token
+   * @param serviceStatuses - services' statuses and server token
    */
-  public static async updateServicesStatuses(serviceStatus: IServiceStatus): Promise<mongoose.Document> {
-    if (!(await ServiceStatus.findOne({ serverToken: serviceStatus.serverToken }))) {
-      await this.add(serviceStatus);
+  public static async updateServicesStatuses(serviceStatuses: IServiceStatus): Promise<mongoose.Document> {
+    const server = !(await ServiceStatus.findOne({ serverToken: serviceStatuses.serverToken }));
+
+    if (server) {
+      await this.add(serviceStatuses);
     }
 
     return ServiceStatus.updateOne({
-      serverToken: serviceStatus.id,
+      serverToken: serviceStatuses.id,
     }, {
       $set: {
-        services: serviceStatus.services,
+        services: serviceStatuses.services,
       },
 
     }, {

@@ -6,7 +6,7 @@ import IWorkspace from './../types/workspace';
 import Client from 'ctproto/build/src/server/client';
 import { DevopsToolboxAuthData } from '../types/api/responses/authorize';
 import { ApiOutgoingMessage, ApiResponse } from '../types';
-import ServerService from '../services/server';
+import Server from '../services/server';
 
 /**
  * Statuses controller to work with updating/checking/sending statuses of servers' statuses for each workspace
@@ -26,22 +26,25 @@ export default class StatusesController {
         /**
          * Get workspace servers and their projects
          */
-        const workspaceAggregations = await WorkspacesService.aggregateServices(workspace._id);
+        const serverProjects = await WorkspacesService.aggregateServices(workspace._id);
 
         /**
          * For each object with serverId and projects of the server update statuses
          */
-        for (const workspaceAggregation of workspaceAggregations) {
+        for (const serverProject of serverProjects) {
           const serverServicesStatuses: ServiceStatus = {} as ServiceStatus;
 
-          for (const service of workspaceAggregation.servicesList) {
-            const serviceList = service.projectName.flat(Infinity);
+          /**
+           * If type of service is nginx, server's projects are pinged
+           */
+          if (serverProject.servicesList.type === 'nginx') {
+            const serviceList = serverProject.servicesList.projectName.flat(Infinity);
 
             const serviceStatuses = await this.checkingServicesAvailability(serviceList);
 
-            serverServicesStatuses.serverToken = workspaceAggregation._id;
+            serverServicesStatuses.serverToken = serverProject._id;
             serverServicesStatuses.services = serviceStatuses;
-            await ServerService.updateServicesStatuses(serverServicesStatuses);
+            await Server.updateServicesStatuses(serverServicesStatuses);
           }
         }
       }
