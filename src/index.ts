@@ -27,7 +27,7 @@ const transport = new CTProtoServer<AuthorizeMessagePayload, DevopsToolboxAuthDa
     /**
      * Connected client's workspaces list
      */
-    const workspaces = await WorkspacesService.find({});
+    const workspaces = await WorkspacesService.find({ authToken });
 
     if (!workspaces?.length) {
       throw new Error('Wrong auth token passed');
