@@ -41,15 +41,7 @@ export default class WorkspacesService {
         $unwind: '$servers',
       },
       {
-        $group: {
-          _id: '$servers.token',
-          servicesList: {
-            $push: {
-              serviceType: '$servers.services.type',
-              projectName: '$servers.services.payload.serverName',
-            },
-          },
-        },
+        $unwind: '$servers.services',
       },
     ]);
   }

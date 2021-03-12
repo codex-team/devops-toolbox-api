@@ -23,9 +23,10 @@ export default class Server {
    * @param serviceStatuses - services' statuses and server token
    */
   public static async updateServicesStatuses(serviceStatuses: IServiceStatus): Promise<mongoose.Document> {
-    const server = !(await ServiceStatus.findOne({ serverToken: serviceStatuses.serverToken }));
+    const server = await ServiceStatus.findOne({ serverToken: serviceStatuses.serverToken });
 
-    if (server) {
+
+    if (!server) {
       await this.add(serviceStatuses);
     }
 

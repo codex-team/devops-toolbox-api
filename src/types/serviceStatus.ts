@@ -7,7 +7,7 @@ export interface Projects {
   /**
    * Name of service
    */
-  name: string;
+  host: string;
   /**
    * State of service (online/offline)
    */

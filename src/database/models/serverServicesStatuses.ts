@@ -16,10 +16,16 @@ const serverServicesStatusesSchema: mongoose.Schema = new mongoose.Schema({
    * Workspace server's projects' names and statuses
    */
   services: [ {
-    name: {
+    /**
+     * Host name
+     */
+    host: {
       type: String,
       required: true,
     },
+    /**
+     * host status
+     */
     isOnline: {
       type: Boolean,
       required: true,

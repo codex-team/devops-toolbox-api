@@ -7,6 +7,7 @@ import Client from 'ctproto/build/src/server/client';
 import { DevopsToolboxAuthData } from '../types/api/responses/authorize';
 import { ApiOutgoingMessage, ApiResponse } from '../types';
 import Server from '../services/server';
+import WorkspacesAggregation from '../types/servicesAggregation';
 
 /**
  * Statuses controller to work with updating/checking/sending statuses of servers' statuses for each workspace
@@ -26,24 +27,29 @@ export default class StatusesController {
         /**
          * Get workspace servers and their projects
          */
-        const serverProjects = await WorkspacesService.aggregateServices(workspace._id);
+        const workspaceAggregations: WorkspacesAggregation[] = await WorkspacesService.aggregateServices(workspace._id);
 
         /**
          * For each object with serverId and projects of the server update statuses
          */
-        for (const serverProject of serverProjects) {
+        for (const w of workspaceAggregations) {
           const serverServicesStatuses: ServiceStatus = {} as ServiceStatus;
 
           /**
            * If type of service is nginx, server's projects are pinged
            */
-          if (serverProject.servicesList.type === 'nginx') {
-            const serviceList = serverProject.servicesList.projectName.flat(Infinity);
+          if (w.servers.services.type === 'nginx') {
+            const projectList = w.servers.services.payload;
+            const servers:string[] = [];
 
-            const serviceStatuses = await this.checkingServicesAvailability(serviceList);
+            for (const project of projectList) {
+              servers.push(project.serverName as string);
+            }
+            const serviceStatuses = await this.checkingServicesAvailability(servers);
 
-            serverServicesStatuses.serverToken = serverProject._id;
+            serverServicesStatuses.serverToken = w.authToken;
             serverServicesStatuses.services = serviceStatuses;
+
             await Server.updateServicesStatuses(serverServicesStatuses);
           }
         }
@@ -62,10 +68,19 @@ export default class StatusesController {
     for (const serverProject of serverProjects) {
       const pingService = await ping.promise.probe(serverProject);
 
-      statuses.push({
-        name: serverProject,
-        isOnline: pingService.alive,
-      });
+      console.log(serverProject);
+
+      if (serverProject === '') {
+        statuses.push({
+          host: 'Unnamed host',
+          isOnline: false,
+        });
+      } else {
+        statuses.push({
+          host: serverProject,
+          isOnline: pingService.alive,
+        });
+      }
     }
 
     return statuses;
