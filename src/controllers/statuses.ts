@@ -68,8 +68,6 @@ export default class StatusesController {
     for (const serverProject of serverProjects) {
       const pingService = await ping.promise.probe(serverProject);
 
-      console.log(serverProject);
-
       if (serverProject === '') {
         statuses.push({
           host: 'Unnamed host',
