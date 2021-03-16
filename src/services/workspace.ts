@@ -1,6 +1,7 @@
 import mongoose from '../database';
 import Workspace from '../database/models/workspace';
 import { Workspace as IWorkspace, Service } from '../types';
+import ServicesAggregation from '../types/servicesAggregation';
 
 /**
  * Workspace service
@@ -13,6 +14,36 @@ export default class WorkspacesService {
    */
   public static async find(workspaceOptions: mongoose.FilterQuery<typeof Workspace> = {}): Promise<IWorkspace[] | null> {
     return Workspace.find(workspaceOptions);
+  }
+
+  /**
+   * Find one workspace with options
+   *
+   * @param workspaceOptions - Workspace options for looking for documents
+   */
+  public static async findOne(workspaceOptions: mongoose.FilterQuery<typeof Workspace> = {}): Promise<IWorkspace | null> {
+    return Workspace.findOne(workspaceOptions);
+  }
+
+  /**
+   * Sharing workspace to objects with id(server token),list of projects and type of service
+   *
+   * @param id - id of aggregating workspace
+   */
+  public static async aggregateServices(id: mongoose.Types.ObjectId): Promise<ServicesAggregation[]> {
+    return Workspace.aggregate([
+      {
+        $match: {
+          _id: id,
+        },
+      },
+      {
+        $unwind: '$servers',
+      },
+      {
+        $unwind: '$servers.services',
+      },
+    ]);
   }
 
   /**

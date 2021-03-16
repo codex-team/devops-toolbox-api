@@ -2,9 +2,11 @@
 /// <reference path="./types/app.d.ts" />
 import { CTProtoServer } from 'ctproto';
 import app from './app';
+import cron from 'node-cron';
 import Config from './config';
 import { WorkspacesController, ApiRequest, ApiResponse, ApiOutgoingMessage } from './types';
 import WorkspacesService from './services/workspace';
+import StatusesController from './controllers/statuses';
 import { AuthorizeMessagePayload } from './types/api/requests/authorize';
 import { DevopsToolboxAuthData } from './types/api/responses/authorize';
 
@@ -16,14 +18,12 @@ app.listen(Config.httpPort, Config.host, () => {
  * Initialize CTProto server for API
  */
 const transport = new CTProtoServer<AuthorizeMessagePayload, DevopsToolboxAuthData, ApiRequest, ApiResponse, ApiOutgoingMessage>({
-  host: Config.host,
   port: Config.wsPort,
   async onAuth(authRequestPayload: AuthorizeMessagePayload): Promise<DevopsToolboxAuthData> {
     /**
      * Connected client's authorization token
      */
     const authToken = authRequestPayload.token.toString();
-
     /**
      * Connected client's workspaces list
      */
@@ -63,3 +63,10 @@ const transport = new CTProtoServer<AuthorizeMessagePayload, DevopsToolboxAuthDa
  * @example req.app.locals.transport
  */
 app.context = { transport };
+
+/**
+ * Ping availability of connected user's services
+ */
+cron.schedule(Config.pingSchedule, () => {
+  StatusesController.updateStatuses();
+});
