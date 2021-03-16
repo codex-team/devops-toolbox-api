@@ -34,7 +34,7 @@ export default class Server {
       serverToken: serviceStatuses.id,
     }, {
       $set: {
-        services: serviceStatuses.services,
+        projects: serviceStatuses.projects,
       },
 
     }, {

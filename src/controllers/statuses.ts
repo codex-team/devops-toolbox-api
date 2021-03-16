@@ -38,31 +38,18 @@ export default class StatusesController {
           /**
            * If type of service is nginx, server's projects are pinged
            */
-          if (w.servers.services.type === 'nginx') {
-            const projectList = w.servers.services.payload;
-            const servers:string[] = [];
-
-            for (const project of projectList) {
-              servers.push(project.serverName as string);
-            }
-            const serviceStatuses = await this.checkingServicesAvailability(servers);
-
-            serverServicesStatuses.serverToken = w.authToken;
-            serverServicesStatuses.services = serviceStatuses;
-
-            await Server.updateServicesStatuses(serverServicesStatuses);
-          }
+          await this.pingProjects(w.servers.services.type, w, serverServicesStatuses);
         }
       }
     }
   }
 
   /**
-   * Service availability check
+   * Projects availability check
    *
-   * @param serverProjects - array of workspace server's services
+   * @param serverProjects - array of workspace server's projects
    */
-  public static async checkingServicesAvailability(serverProjects:string[]): Promise<Projects[]> {
+  public static async checkingProjectsAvailability(serverProjects:string[]): Promise<Projects[]> {
     const statuses:Projects[] = [];
 
     for (const serverProject of serverProjects) {
@@ -82,6 +69,30 @@ export default class StatusesController {
     }
 
     return statuses;
+  }
+
+  /**
+   * Ping projects, if service is nginx
+   *
+   * @param serviceType - type of service
+   * @param workspaceAggregation - object with serverId and projects of server
+   * @param serverServicesStatuses - object with serverToken and statuses of server's projects
+   */
+  public static async pingProjects(serviceType:string, workspaceAggregation: WorkspacesAggregation, serverServicesStatuses: ServiceStatus = {} as ServiceStatus): Promise<void> {
+    if (serviceType === 'nginx') {
+      const projectList = workspaceAggregation.servers.services.payload;
+      const projects: string[] = [];
+
+      for (const project of projectList) {
+        projects.push(project.serverName as string);
+      }
+      const projectsStatuses = await StatusesController.checkingProjectsAvailability(projects);
+
+      serverServicesStatuses.serverToken = workspaceAggregation.authToken;
+      serverServicesStatuses.projects = projectsStatuses;
+
+      await Server.updateServicesStatuses(serverServicesStatuses);
+    }
   }
 
   /**

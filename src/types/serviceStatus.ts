@@ -22,7 +22,7 @@ export default interface ServiceStatus extends mongoose.Document {
    */
   serverToken: string;
   /**
-   * Services of the server
+   * Projects of the server
    */
-  services: Projects[];
+  projects: Projects[];
 }

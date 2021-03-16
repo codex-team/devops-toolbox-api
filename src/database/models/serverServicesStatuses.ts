@@ -15,7 +15,7 @@ const serverServicesStatusesSchema: mongoose.Schema = new mongoose.Schema({
   /**
    * Workspace server's projects' names and statuses
    */
-  services: [ {
+  projects: [ {
     /**
      * Host name
      */
