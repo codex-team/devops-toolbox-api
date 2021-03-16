@@ -47,10 +47,11 @@ export default class StatusesController {
             }
             const serviceStatuses = await this.checkingServicesAvailability(servers);
 
-            serverServicesStatuses.serverToken = w.authToken;
+            serverServicesStatuses.serverToken = w.servers.token;
             serverServicesStatuses.services = serviceStatuses;
 
             await Server.updateServicesStatuses(serverServicesStatuses);
+            await this.sendStatuses(serverServicesStatuses, w.authToken);
           }
         }
       }
@@ -87,15 +88,17 @@ export default class StatusesController {
   /**
    * Send statuses to clients
    *
-   * @param statuses - array of statuses of all client services
-   * @param user - user
+   * @param statuses - statuses of all client's services
+   * @param authToken - token of user
    */
-  public static sendStatuses(statuses: ServiceStatus[], user: Client<DevopsToolboxAuthData, ApiResponse, ApiOutgoingMessage>): void {
-    if (typeof user.authData.userToken === 'string') {
+  public static async sendStatuses(statuses: ServiceStatus, authToken: string): Promise<void> {
+    try {
       app.context.transport
         .clients
-        .find((client) => client.authData.userToken === user.authData.userToken)
+        .find((client) => client.authData.userToken === authToken)
         .send('statuses-updated', { statuses });
+    } catch (e) {
+      console.log(e);
     }
   }
 }

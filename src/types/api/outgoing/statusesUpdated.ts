@@ -8,7 +8,7 @@ interface StatusesUpdatedPayload {
   /**
    * The updated workspace
    */
-  statuses: ServiceStatus[];
+  statuses: ServiceStatus;
 }
 
 /**
