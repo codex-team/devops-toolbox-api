@@ -38,7 +38,7 @@ export default class StatusesController {
           /**
            * If type of service is nginx, server's projects are pinged
            */
-          await this.pingProjects(w.servers.services.type, w, serverServicesStatuses);
+          await this.pingProjects(w, serverServicesStatuses);
         }
       }
     }
@@ -74,21 +74,22 @@ export default class StatusesController {
   /**
    * Ping projects, if service is nginx
    *
-   * @param serviceType - type of service
    * @param workspaceAggregation - object with serverId and projects of server
    * @param serverServicesStatuses - object with serverToken and statuses of server's projects
    */
-  public static async pingProjects(serviceType:string, workspaceAggregation: WorkspacesAggregation, serverServicesStatuses: ServiceStatus = {} as ServiceStatus): Promise<void> {
+  public static async pingProjects(workspaceAggregation: WorkspacesAggregation, serverServicesStatuses: ServiceStatus = {} as ServiceStatus): Promise<void> {
+    const serviceType = workspaceAggregation.servers.services.type;
+
     if (serviceType === 'nginx') {
       const projectList = workspaceAggregation.servers.services.payload;
       const projects: string[] = [];
 
-      for (const project of projectList) {
+      projectList.forEach((project) => {
         projects.push(project.serverName as string);
-      }
+      });
       const projectsStatuses = await StatusesController.checkingProjectsAvailability(projects);
 
-      serverServicesStatuses.serverToken = workspaceAggregation.authToken;
+      serverServicesStatuses.serverToken = workspaceAggregation.servers.token;
       serverServicesStatuses.projects = projectsStatuses;
 
       await Server.updateServicesStatuses(serverServicesStatuses);
