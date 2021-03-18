@@ -7,7 +7,7 @@ import Client from 'ctproto/build/src/server/client';
 import { DevopsToolboxAuthData } from '../types/api/responses/authorize';
 import { ApiOutgoingMessage, ApiResponse } from '../types';
 import Server from '../services/server';
-import WorkspacesAggregation from '../types/servicesAggregation';
+import WorkspacesAggregation, { Server as IServer } from '../types/servicesAggregation';
 
 /**
  * Statuses controller to work with updating/checking/sending statuses of servers' statuses for each workspace
@@ -38,7 +38,7 @@ export default class StatusesController {
           /**
            * If type of service is nginx, server's projects are pinged
            */
-          await this.pingProjects(w, serverServicesStatuses);
+          await this.pingProjects(w.servers, serverServicesStatuses);
         }
       }
     }
@@ -74,14 +74,14 @@ export default class StatusesController {
   /**
    * Ping projects, if service is nginx
    *
-   * @param workspaceAggregation - object with serverId and projects of server
+   * @param workspaceAggregationServer - object with serverId and projects of server
    * @param serverServicesStatuses - object with serverToken and statuses of server's projects
    */
-  public static async pingProjects(workspaceAggregation: WorkspacesAggregation, serverServicesStatuses: ServiceStatus = {} as ServiceStatus): Promise<void> {
-    const serviceType = workspaceAggregation.servers.services.type;
+  public static async pingProjects(workspaceAggregationServer: IServer, serverServicesStatuses: ServiceStatus = {} as ServiceStatus): Promise<void> {
+    const serviceType = workspaceAggregationServer.services.type;
 
     if (serviceType === 'nginx') {
-      const projectList = workspaceAggregation.servers.services.payload;
+      const projectList = workspaceAggregationServer.services.payload;
       const projects: string[] = [];
 
       projectList.forEach((project) => {
@@ -89,7 +89,7 @@ export default class StatusesController {
       });
       const projectsStatuses = await StatusesController.checkingProjectsAvailability(projects);
 
-      serverServicesStatuses.serverToken = workspaceAggregation.servers.token;
+      serverServicesStatuses.serverToken = workspaceAggregationServer.token;
       serverServicesStatuses.projects = projectsStatuses;
 
       await Server.updateServicesStatuses(serverServicesStatuses);
