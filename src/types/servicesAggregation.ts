@@ -4,7 +4,7 @@ import Service from './service';
 /**
  * Interface for server
  */
-interface Server {
+export interface Server {
   /**
    * Server name
    */
