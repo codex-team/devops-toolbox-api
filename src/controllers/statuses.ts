@@ -66,8 +66,6 @@ export default class StatusesController {
   public static async checkProjectAvailability(serverProject:string): Promise<ProjectStatus> {
     const pingServer = await ping.promise.probe(serverProject);
 
-    console.log(pingServer);
-
     if (serverProject === '') {
       return {
         host: 'Unnamed host',
