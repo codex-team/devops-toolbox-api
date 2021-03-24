@@ -38,10 +38,6 @@ export default interface WorkspaceAggregation {
    * Name of workspace
    */
   name: string;
-  /**
-   * Authtoken of workspace
-   */
-  authToken: string;
 
   /**
    * Server of workspace

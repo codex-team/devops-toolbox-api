@@ -37,6 +37,13 @@ export default class WorkspacesService {
           _id: id,
         },
       },
+      {
+        $group: {
+          _id: id,
+          name: { $last: '$name' },
+          servers: { $last: '$servers' },
+        },
+      },
     ]);
   }
 
