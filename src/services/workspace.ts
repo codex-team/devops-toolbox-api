@@ -1,7 +1,7 @@
 import mongoose from '../database';
 import Workspace from '../database/models/workspace';
 import { Workspace as IWorkspace, Service } from '../types';
-import ServicesAggregation from '../types/servicesAggregation';
+import WorkspaceAggregation from '../types/workspaceAggregation';
 
 /**
  * Workspace service
@@ -30,18 +30,12 @@ export default class WorkspacesService {
    *
    * @param id - id of aggregating workspace
    */
-  public static async aggregateServices(id: mongoose.Types.ObjectId): Promise<ServicesAggregation[]> {
+  public static async aggregateServices(id: mongoose.Types.ObjectId): Promise<WorkspaceAggregation[]> {
     return Workspace.aggregate([
       {
         $match: {
           _id: id,
         },
-      },
-      {
-        $unwind: '$servers',
-      },
-      {
-        $unwind: '$servers.services',
       },
     ]);
   }

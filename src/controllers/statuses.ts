@@ -1,13 +1,18 @@
 import ping from 'ping';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars-experimental,@typescript-eslint/no-unused-vars
 import app from './../app';
 import WorkspacesService from './../services/workspace';
-import ServiceStatus, { Projects } from './../types/serviceStatus';
+import ServerProjectsStatuses, { ProjectStatus } from '../types/serverProjectsStatuses';
 import IWorkspace from './../types/workspace';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/no-unused-vars-experimental
 import Client from 'ctproto/build/src/server/client';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/no-unused-vars-experimental
 import { DevopsToolboxAuthData } from '../types/api/responses/authorize';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/no-unused-vars-experimental
 import { ApiOutgoingMessage, ApiResponse } from '../types';
 import Server from '../services/server';
-import WorkspacesAggregation, { Server as IServer } from '../types/servicesAggregation';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/no-unused-vars-experimental
+import WorkspaceAggregation, { Server as IServer } from '../types/workspaceAggregation';
 
 /**
  * Statuses controller to work with updating/checking/sending statuses of servers' statuses for each workspace
@@ -27,73 +32,68 @@ export default class StatusesController {
         /**
          * Get workspace servers and their projects
          */
-        const workspaceAggregations: WorkspacesAggregation[] = await WorkspacesService.aggregateServices(workspace._id);
+        const workspaceAggregations: WorkspaceAggregation[] = await WorkspacesService.aggregateServices(workspace._id);
 
         /**
          * For each object with serverId and projects of the server update statuses
          */
         for (const w of workspaceAggregations) {
-          const serverServicesStatuses: ServiceStatus = {} as ServiceStatus;
+          for (const s of w.servers) {
+            for (const service of s.services) {
+            /**
+             * If type of service is nginx, server's projects are pinged
+             */
+              if (service.type == 'nginx') {
+                const projectsStatuses = await this.pingProjects(service.payload);
+                const serverProjectsStatuses: ServerProjectsStatuses = {} as ServerProjectsStatuses;
 
-          /**
-           * If type of service is nginx, server's projects are pinged
-           */
-          await this.pingProjects(w.servers, serverServicesStatuses);
+                serverProjectsStatuses.projectsStatuses = projectsStatuses;
+                serverProjectsStatuses.serverToken = s.token;
+                await Server.updateServicesStatuses(serverProjectsStatuses);
+              }
+            }
+          }
         }
       }
     }
   }
 
   /**
-   * Projects availability check
+   * Project availability check
    *
-   * @param serverProjects - array of workspace server's projects
+   * @param serverProject - array of workspace server's projects
    */
-  public static async checkingProjectsAvailability(serverProjects:string[]): Promise<Projects[]> {
-    const statuses:Projects[] = [];
+  public static async checkProjectAvailability(serverProject:string): Promise<ProjectStatus> {
+    const pingServer = await ping.promise.probe(serverProject);
 
-    for (const serverProject of serverProjects) {
-      const pingService = await ping.promise.probe(serverProject);
+    console.log(pingServer);
 
-      if (serverProject === '') {
-        statuses.push({
-          host: 'Unnamed host',
-          isOnline: false,
-        });
-      } else {
-        statuses.push({
-          host: serverProject,
-          isOnline: pingService.alive,
-        });
-      }
+    if (serverProject === '') {
+      return {
+        host: 'Unnamed host',
+        isOnline: false,
+      };
+    } else {
+      return {
+        host: serverProject,
+        isOnline: pingServer.alive,
+      };
     }
-
-    return statuses;
   }
 
   /**
-   * Ping projects, if service is nginx
+   * Ping projects of some server
    *
-   * @param workspaceAggregationServer - object with serverId and projects of server
-   * @param serverServicesStatuses - object with serverToken and statuses of server's projects
+   * @param projectList - list of project of payload of some service of some server
    */
-  public static async pingProjects(workspaceAggregationServer: IServer, serverServicesStatuses: ServiceStatus = {} as ServiceStatus): Promise<void> {
-    const serviceType = workspaceAggregationServer.services.type;
+  public static async pingProjects(projectList: Record<string, unknown>[]): Promise<ProjectStatus[]> {
+    const projectsStatuses:ProjectStatus[] = [];
 
-    if (serviceType === 'nginx') {
-      const projectList = workspaceAggregationServer.services.payload;
-      const projects: string[] = [];
-
-      projectList.forEach((project) => {
-        projects.push(project.serverName as string);
-      });
-      const projectsStatuses = await StatusesController.checkingProjectsAvailability(projects);
-
-      serverServicesStatuses.serverToken = workspaceAggregationServer.token;
-      serverServicesStatuses.projects = projectsStatuses;
-
-      await Server.updateServicesStatuses(serverServicesStatuses);
+    for (const project of projectList) {
+      projectsStatuses.push(await StatusesController.checkProjectAvailability(project['serverName'] as string));
     }
+
+    return projectsStatuses;
   }
 
   /**
@@ -102,12 +102,12 @@ export default class StatusesController {
    * @param statuses - array of statuses of all client services
    * @param user - user
    */
-  public static sendStatuses(statuses: ServiceStatus[], user: Client<DevopsToolboxAuthData, ApiResponse, ApiOutgoingMessage>): void {
-    if (typeof user.authData.userToken === 'string') {
-      app.context.transport
-        .clients
-        .find((client) => client.authData.userToken === user.authData.userToken)
-        .send('statuses-updated', { statuses });
-    }
-  }
+  // public static sendStatuses(statuses: ServerProjectsStatuses[], user: Client<DevopsToolboxAuthData, ApiResponse, ApiOutgoingMessage>): void {
+  //   if (typeof user.authData.userToken === 'string') {
+  //     app.context.transport
+  //       .clients
+  //       .find((client) => client.authData.userToken === user.authData.userToken)
+  //       .send('statuses-updated', { statuses });
+  //   }
+  // }
 }

@@ -1,5 +1,5 @@
-import ServiceStatus from './../../serviceStatus';
 import { NewMessage } from 'ctproto/types';
+import ServerProjectsStatuses from '../../serverProjectsStatuses';
 
 /**
  * Data about the updated statuses
@@ -8,7 +8,7 @@ interface StatusesUpdatedPayload {
   /**
    * The updated workspace
    */
-  statuses: ServiceStatus[];
+  projectsStatuses: ServerProjectsStatuses;
 }
 
 /**

@@ -1,10 +1,10 @@
 import mongoose from '..';
-import ServiceStatus from '../../types/serviceStatus';
+import ServerProjectsStatuses from '../../types/serverProjectsStatuses';
 
 /**
  * Project status Schema
  */
-const serverServicesStatusesSchema: mongoose.Schema = new mongoose.Schema({
+const serverProjectsStatusesSchema: mongoose.Schema = new mongoose.Schema({
   /**
    * Workspace server's token
    */
@@ -15,7 +15,7 @@ const serverServicesStatusesSchema: mongoose.Schema = new mongoose.Schema({
   /**
    * Workspace server's projects' names and statuses
    */
-  projects: [ {
+  projectsStatuses: [ {
     /**
      * Host name
      */
@@ -33,4 +33,4 @@ const serverServicesStatusesSchema: mongoose.Schema = new mongoose.Schema({
   } ],
 });
 
-export default mongoose.model<ServiceStatus>('service_statuses', serverServicesStatusesSchema);
+export default mongoose.model<ServerProjectsStatuses>('server_projects_statuses', serverProjectsStatusesSchema);

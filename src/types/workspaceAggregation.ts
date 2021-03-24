@@ -24,14 +24,14 @@ export interface Server {
   /**
    * List of services running on the server
    */
-  services: Service;
+  services: Service[];
 }
 /**
  * Interface for server
  */
-export default interface ServicesAggregation {
+export default interface WorkspaceAggregation {
   /**
-   * ID of aggregation
+   * ID of workspace
    */
   _id: string;
   /**
@@ -46,5 +46,5 @@ export default interface ServicesAggregation {
   /**
    * Server of workspace
    */
-  servers: Server;
+  servers: Server[];
 }

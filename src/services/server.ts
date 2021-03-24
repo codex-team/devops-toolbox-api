@@ -1,4 +1,4 @@
-import IServiceStatus from '../types/serviceStatus';
+import IServiceStatus from '../types/serverProjectsStatuses';
 import mongoose from '../database';
 import ServiceStatus from '../database/models/serverServicesStatuses';
 
@@ -25,16 +25,15 @@ export default class Server {
   public static async updateServicesStatuses(serviceStatuses: IServiceStatus): Promise<mongoose.Document> {
     const server = await ServiceStatus.findOne({ serverToken: serviceStatuses.serverToken });
 
-
     if (!server) {
       await this.add(serviceStatuses);
     }
 
     return ServiceStatus.updateOne({
-      serverToken: serviceStatuses.id,
+      serverToken: serviceStatuses.serverToken,
     }, {
       $set: {
-        projects: serviceStatuses.projects,
+        projectsStatuses: serviceStatuses.projectsStatuses,
       },
 
     }, {
