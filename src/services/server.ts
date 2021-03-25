@@ -1,6 +1,6 @@
-import IServiceStatus from '../types/serverProjectsStatuses';
 import mongoose from '../database';
-import ServiceStatus from '../database/models/serverServicesStatuses';
+import ServerProjectsStatuses from '../types/serverProjectsStatuses';
+import IServerProjectsStatuses from '../database/models/serverServicesStatuses';
 
 /**
  * Server of workspace with token,services and projects
@@ -11,29 +11,29 @@ export default class Server {
    *
    * @param server - new server
    */
-  public static async add(server: IServiceStatus): Promise<IServiceStatus | null> {
-    const newServer = new ServiceStatus(server);
+  public static async add(server: ServerProjectsStatuses): Promise<ServerProjectsStatuses | null> {
+    const newServer = new IServerProjectsStatuses(server);
 
     return newServer.save();
   }
 
   /**
-   * Update of services' statuses in DB
+   * Update of server projects' statuses in DB
    *
-   * @param serviceStatuses - services' statuses and server token
+   * @param serverProjectsStatuses - server projects' statuses and server token
    */
-  public static async updateServicesStatuses(serviceStatuses: IServiceStatus): Promise<mongoose.Document> {
-    const server = await ServiceStatus.findOne({ serverToken: serviceStatuses.serverToken });
+  public static async updateServicesStatuses(serverProjectsStatuses: ServerProjectsStatuses): Promise<mongoose.Document> {
+    const server = await IServerProjectsStatuses.findOne({ serverToken: serverProjectsStatuses.serverToken });
 
     if (!server) {
-      await this.add(serviceStatuses);
+      await this.add(serverProjectsStatuses);
     }
 
-    return ServiceStatus.updateOne({
-      serverToken: serviceStatuses.serverToken,
+    return IServerProjectsStatuses.updateOne({
+      serverToken: serverProjectsStatuses.serverToken,
     }, {
       $set: {
-        projectsStatuses: serviceStatuses.projectsStatuses,
+        projectsStatuses: serverProjectsStatuses.projectsStatuses,
       },
 
     }, {

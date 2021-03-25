@@ -45,10 +45,11 @@ export default class StatusesController {
              */
               if (service.type == 'nginx') {
                 const projectsStatuses = await this.pingProjects(service.payload);
-                const serverProjectsStatuses: ServerProjectsStatuses = {} as ServerProjectsStatuses;
+                const serverProjectsStatuses: ServerProjectsStatuses = {
+                  projectsStatuses,
+                  serverToken: s.token,
+                } as ServerProjectsStatuses;
 
-                serverProjectsStatuses.projectsStatuses = projectsStatuses;
-                serverProjectsStatuses.serverToken = s.token;
                 await Server.updateServicesStatuses(serverProjectsStatuses);
               }
             }
@@ -64,14 +65,14 @@ export default class StatusesController {
    * @param serverProject - array of workspace server's projects
    */
   public static async checkProjectAvailability(serverProject:string): Promise<ProjectStatus> {
-    const pingServer = await ping.promise.probe(serverProject);
-
     if (serverProject === '') {
       return {
         host: 'Unnamed host',
         isOnline: false,
       };
     } else {
+      const pingServer = await ping.promise.probe(serverProject);
+
       return {
         host: serverProject,
         isOnline: pingServer.alive,
