@@ -1,31 +1,5 @@
-import SSHConnectionInfo from './SSHConnectionInfo';
-import Service from './service';
+import Server from './server';
 
-/**
- * Interface for server
- */
-export interface Server {
-  /**
-   * Server name
-   */
-  name: string;
-
-  /**
-   * Integration token
-   * given on server creation
-   */
-  token: string;
-
-  /**
-   * Information for SSH connection to server
-   */
-  sshConnectionInfo: SSHConnectionInfo;
-
-  /**
-   * List of services running on the server
-   */
-  services: Service[];
-}
 /**
  * Interface for server
  */
