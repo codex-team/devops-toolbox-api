@@ -12,7 +12,6 @@ import { DevopsToolboxAuthData } from '../types/api/responses/authorize';
 import { ApiOutgoingMessage, ApiResponse } from '../types';
 import Server from '../services/server';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/no-unused-vars-experimental
-import WorkspaceAggregation, { Server as IServer } from '../types/workspaceAggregation';
 
 /**
  * Statuses controller to work with updating/checking/sending statuses of servers' statuses for each workspace
@@ -30,28 +29,21 @@ export default class StatusesController {
     if (workspaces) {
       for (const workspace of workspaces) {
         /**
-         * Get workspace servers and their projects
+         * For each server of workspace update statuses
          */
-        const workspaceAggregations: WorkspaceAggregation[] = await WorkspacesService.aggregateServices(workspace._id);
-
-        /**
-         * For each object with serverId and projects of the server update statuses
-         */
-        for (const w of workspaceAggregations) {
-          for (const s of w.servers) {
-            for (const service of s.services) {
+        for (const s of workspace.servers) {
+          for (const service of s.services) {
             /**
              * If type of service is nginx, server's projects are pinged
              */
-              if (service.type == 'nginx') {
-                const projectsStatuses = await this.pingProjects(service.payload);
-                const serverProjectsStatuses: ServerProjectsStatuses = {
-                  projectsStatuses,
-                  serverToken: s.token,
-                } as ServerProjectsStatuses;
+            if (service.type == 'nginx') {
+              const projectsStatuses = await this.pingProjects(service.payload);
+              const serverProjectsStatuses: ServerProjectsStatuses = {
+                projectsStatuses,
+                serverToken: s.token,
+              } as ServerProjectsStatuses;
 
-                await Server.updateServicesStatuses(serverProjectsStatuses);
-              }
+              await Server.updateServicesStatuses(serverProjectsStatuses);
             }
           }
         }
