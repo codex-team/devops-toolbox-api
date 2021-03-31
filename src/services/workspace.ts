@@ -1,7 +1,6 @@
 import mongoose from '../database';
 import Workspace from '../database/models/workspace';
 import { Workspace as IWorkspace, Service } from '../types';
-import WorkspaceAggregation from '../types/workspaceAggregation';
 
 /**
  * Workspace service
@@ -23,28 +22,6 @@ export default class WorkspacesService {
    */
   public static async findOne(workspaceOptions: mongoose.FilterQuery<typeof Workspace> = {}): Promise<IWorkspace | null> {
     return Workspace.findOne(workspaceOptions);
-  }
-
-  /**
-   * Sharing workspace to objects with id(server token),list of projects and type of service
-   *
-   * @param id - id of aggregating workspace
-   */
-  public static async aggregateServices(id: mongoose.Types.ObjectId): Promise<WorkspaceAggregation[]> {
-    return Workspace.aggregate([
-      {
-        $match: {
-          _id: id,
-        },
-      },
-      {
-        $group: {
-          _id: id,
-          name: { $last: '$name' },
-          servers: { $last: '$servers' },
-        },
-      },
-    ]);
   }
 
   /**
