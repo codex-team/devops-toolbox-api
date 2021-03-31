@@ -1,6 +1,6 @@
 import mongoose from '../database';
-import ServerProjectsStatuses from '../types/serverProjectsStatuses';
-import IServerProjectsStatuses from '../database/models/serverServicesStatuses';
+import IServerProjectsStatuses from '../types/serverProjectsStatuses';
+import ServerProjectsStatuses from '../database/models/serverServicesStatuses';
 
 /**
  * Server of workspace with token,services and projects
@@ -11,8 +11,8 @@ export default class Server {
    *
    * @param server - new server
    */
-  public static async add(server: ServerProjectsStatuses): Promise<ServerProjectsStatuses | null> {
-    const newServer = new IServerProjectsStatuses(server);
+  public static async add(server: IServerProjectsStatuses): Promise<IServerProjectsStatuses | null> {
+    const newServer = new ServerProjectsStatuses(server);
 
     return newServer.save();
   }
@@ -22,14 +22,14 @@ export default class Server {
    *
    * @param serverProjectsStatuses - server projects' statuses and server token
    */
-  public static async updateServicesStatuses(serverProjectsStatuses: ServerProjectsStatuses): Promise<mongoose.Document> {
-    const server = await IServerProjectsStatuses.findOne({ serverToken: serverProjectsStatuses.serverToken });
+  public static async updateServicesStatuses(serverProjectsStatuses: IServerProjectsStatuses): Promise<mongoose.Document> {
+    const server = await ServerProjectsStatuses.findOne({ serverToken: serverProjectsStatuses.serverToken });
 
     if (!server) {
       await this.add(serverProjectsStatuses);
     }
 
-    return IServerProjectsStatuses.updateOne({
+    return ServerProjectsStatuses.updateOne({
       serverToken: serverProjectsStatuses.serverToken,
     }, {
       $set: {
