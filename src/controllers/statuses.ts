@@ -3,7 +3,7 @@ import ping from 'ping';
 import app from './../app';
 import WorkspacesService from './../services/workspace';
 import ServerProjectsStatuses, { ProjectStatus } from '../types/serverProjectsStatuses';
-import IWorkspace from './../types/workspace';
+import Workspace from './../types/workspace';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/no-unused-vars-experimental
 import Client from 'ctproto/build/src/server/client';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/no-unused-vars-experimental
@@ -11,6 +11,8 @@ import { DevopsToolboxAuthData } from '../types/api/responses/authorize';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/no-unused-vars-experimental
 import { ApiOutgoingMessage, ApiResponse } from '../types';
 import Server from '../services/server';
+import { NginxPayload } from '../types/servicePayload';
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/no-unused-vars-experimental
 
 /**
@@ -21,7 +23,7 @@ export default class StatusesController {
    * Update statuses and send to logged users
    */
   public static async updateStatuses(): Promise<void> {
-    const workspaces: IWorkspace[] | null = await WorkspacesService.find({});
+    const workspaces: Workspace[] | null = await WorkspacesService.find();
 
     /**
      * If workspaces exist,then updating statuses for them
@@ -37,7 +39,7 @@ export default class StatusesController {
              * If type of service is nginx, server's projects are pinged
              */
             if (service.type == 'nginx') {
-              const projectsStatuses = await this.pingProjects(service.payload);
+              const projectsStatuses = await this.pingProjects(service.payload as NginxPayload[]);
               const serverProjectsStatuses: ServerProjectsStatuses = {
                 projectsStatuses,
                 serverToken: s.token,
@@ -56,7 +58,7 @@ export default class StatusesController {
    *
    * @param serverProject - array of workspace server's projects
    */
-  public static async checkProjectAvailability(serverProject:string): Promise<ProjectStatus> {
+  public static async checkProjectAvailability(serverProject: string): Promise<ProjectStatus> {
     if (serverProject === '') {
       return {
         host: 'Unnamed host',
@@ -75,13 +77,13 @@ export default class StatusesController {
   /**
    * Ping projects of some server
    *
-   * @param projectList - list of project of payload of some service of some server
+   * @param payload - list of project of payload of some service of some server
    */
-  public static async pingProjects(projectList: Record<string, unknown>[]): Promise<ProjectStatus[]> {
+  public static async pingProjects(payload: NginxPayload[]): Promise<ProjectStatus[]> {
     const projectsStatuses:ProjectStatus[] = [];
 
-    for (const project of projectList) {
-      projectsStatuses.push(await StatusesController.checkProjectAvailability(project['serverName'] as string));
+    for (const payloadElement of payload) {
+      projectsStatuses.push(await StatusesController.checkProjectAvailability(payloadElement.serverName));
     }
 
     return projectsStatuses;

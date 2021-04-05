@@ -1,6 +1,7 @@
 import mongoose from '../database';
 import Workspace from '../database/models/workspace';
 import { Workspace as IWorkspace, Service } from '../types';
+import ServicePayload from '../types/servicePayload';
 
 /**
  * Workspace service
@@ -41,7 +42,7 @@ export default class WorkspacesService {
    * @param token - Server token
    * @param actualServices - Actual services
    */
-  public static async updateServices(token: string | undefined, actualServices: Service[]): Promise<IWorkspace | null> {
+  public static async updateServices(token: string | undefined, actualServices: Service<ServicePayload>[]): Promise<IWorkspace | null> {
     return Workspace.findOneAndUpdate({ 'servers.token': token }, {
       $set: {
         'servers.$.services': actualServices,

@@ -1,5 +1,6 @@
 import Service from './service';
 import SSHConnectionInfo from './SSHConnectionInfo';
+import ServicePayload from './servicePayload';
 
 /**
  * Interface for server
@@ -24,5 +25,5 @@ export default interface Server {
   /**
    * List of services running on the server
    */
-  services: Service[];
+  services: Service<ServicePayload>[];
 }
