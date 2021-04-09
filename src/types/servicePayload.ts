@@ -2,14 +2,38 @@
  * Information about connection that is used in docker
  */
 export interface Port {
+  /**
+   * Port for inside container
+   */
   inner: {
+    /**
+     * Host for inside container
+     */
     host: string,
+    /**
+     * Port for inside container
+     */
     port: string,
+    /**
+     * Type of  inside container
+     */
     type: string,
   },
+  /**
+   * Port for outside container
+   */
   outer: {
+    /**
+     * Host for outside container
+     */
     host: string,
+    /**
+     * Port for outside container
+     */
     port: string,
+    /**
+     * Type for outside container
+     */
     type: string,
   }
 }
