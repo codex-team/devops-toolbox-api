@@ -19,9 +19,15 @@ export default interface Service<ServicePayload> {
   payload: ServicePayload[];
 }
 
+/**
+ * Service for case when we are working with nginx
+ */
 export interface NginxService extends Service<NginxPayload> {
   type: 'nginx';
 }
+/**
+ * Service for case when we are working with docker
+ */
 export interface DockerService extends Service<DockerPayload> {
   type: 'docker';
 }

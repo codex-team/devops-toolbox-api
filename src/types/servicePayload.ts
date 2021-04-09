@@ -1,3 +1,6 @@
+/**
+ * Information about connection that is used in docker
+ */
 export interface Port {
   inner: {
     host: string,
@@ -11,12 +14,19 @@ export interface Port {
   }
 }
 
+/**
+ * Useful data about the nginx service
+ * collected by Agent
+ */
 export interface NginxPayload {
   listen: string,
   serverName: string,
   proxyPass: string,
 }
-
+/**
+ * Useful data about the docker service
+ * collected by Agent
+ */
 export interface DockerPayload {
   names: string,
   containerId: string,
@@ -26,6 +36,9 @@ export interface DockerPayload {
   ports: Port[]
 }
 
+/**
+ * Type is used to unite all existing payloads
+ */
 type ServicePayload =
   | NginxPayload
   | DockerPayload;
