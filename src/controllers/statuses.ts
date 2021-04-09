@@ -38,7 +38,7 @@ export default class StatusesController {
             /**
              * If type of service is nginx, server's projects are pinged
              */
-            if (service.type == 'nginx') {
+            if (service.type === 'nginx') {
               const projectsStatuses = await this.pingProjects(service.payload as NginxPayload[]);
               const serverProjectsStatuses: ServerProjectsStatuses = {
                 projectsStatuses,
@@ -83,7 +83,9 @@ export default class StatusesController {
     const projectsStatuses:ProjectStatus[] = [];
 
     for (const payloadElement of payload) {
-      projectsStatuses.push(await StatusesController.checkProjectAvailability(payloadElement.serverName));
+      const projectStatus = await StatusesController.checkProjectAvailability(payloadElement.serverName);
+
+      projectsStatuses.push(projectStatus);
     }
 
     return projectsStatuses;
