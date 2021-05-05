@@ -68,5 +68,9 @@ app.context = { transport };
  * Ping availability of connected user's services
  */
 cron.schedule(Config.pingSchedule, () => {
-  StatusesController.updateStatuses();
+  StatusesController.updateStatuses()
+    .then()
+    .catch(e => {
+      console.log(e);
+    });
 });
