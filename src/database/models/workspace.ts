@@ -19,6 +19,7 @@ const workspaceSchema: mongoose.Schema = new mongoose.Schema({
     type: String,
     required: true,
   },
+
   /**
    * Workspace servers
    */

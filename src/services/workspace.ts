@@ -1,6 +1,7 @@
 import mongoose from '../database';
 import Workspace from '../database/models/workspace';
 import { Workspace as IWorkspace, Service } from '../types';
+import ServicePayload from '../types/servicePayload';
 
 /**
  * Workspace service
@@ -13,6 +14,15 @@ export default class WorkspacesService {
    */
   public static async find(workspaceOptions: mongoose.FilterQuery<typeof Workspace> = {}): Promise<IWorkspace[] | null> {
     return Workspace.find(workspaceOptions);
+  }
+
+  /**
+   * Find one workspace with options
+   *
+   * @param workspaceOptions - Workspace options for looking for documents
+   */
+  public static async findOne(workspaceOptions: mongoose.FilterQuery<typeof Workspace> = {}): Promise<IWorkspace | null> {
+    return Workspace.findOne(workspaceOptions);
   }
 
   /**
@@ -32,7 +42,7 @@ export default class WorkspacesService {
    * @param token - Server token
    * @param actualServices - Actual services
    */
-  public static async updateServices(token: string | undefined, actualServices: Service[]): Promise<IWorkspace | null> {
+  public static async updateServices(token: string | undefined, actualServices: Service<ServicePayload>[]): Promise<IWorkspace | null> {
     return Workspace.findOneAndUpdate({ 'servers.token': token }, {
       $set: {
         'servers.$.services': actualServices,
