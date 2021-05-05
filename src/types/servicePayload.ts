@@ -1,41 +1,33 @@
 /**
+ * Port for inside/outside container
+ */
+export interface ContainerPort {
+  /**
+   * Host for inside container
+   */
+  host: string,
+  /**
+   * Port for inside container
+   */
+  port: string,
+  /**
+   * Type of  inside container
+   */
+  type: string,
+}
+
+/**
  * Information about connection that is used in docker
  */
 export interface Port {
   /**
    * Port for inside container
    */
-  inner: {
-    /**
-     * Host for inside container
-     */
-    host: string,
-    /**
-     * Port for inside container
-     */
-    port: string,
-    /**
-     * Type of  inside container
-     */
-    type: string,
-  },
+  inner: ContainerPort,
   /**
    * Port for outside container
    */
-  outer: {
-    /**
-     * Host for outside container
-     */
-    host: string,
-    /**
-     * Port for outside container
-     */
-    port: string,
-    /**
-     * Type for outside container
-     */
-    type: string,
-  }
+  outer: ContainerPort,
 }
 
 /**
@@ -43,8 +35,17 @@ export interface Port {
  * collected by Agent
  */
 export interface NginxPayload {
+  /**
+   * Port to listen
+   */
   listen: string,
+  /**
+   * Name of the server
+   */
   serverName: string,
+  /**
+   * Protocol and address of a proxied server
+   */
   proxyPass: string,
 }
 /**
@@ -52,11 +53,29 @@ export interface NginxPayload {
  * collected by Agent
  */
 export interface DockerPayload {
+  /**
+   * Name of container
+   */
   names: string,
+  /**
+   * Id of container
+   */
   containerId: string,
+  /**
+   * Image name
+   */
   image: string,
+  /**
+   * Date of creation
+   */
   created: Date,
+  /**
+   * Current status
+   */
   status: string,
+  /**
+   * Ports to connect
+   */
   ports: Port[]
 }
 
